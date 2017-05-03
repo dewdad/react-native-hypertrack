@@ -121,12 +121,15 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
-                successCallback.invoke(response.getResponseObject());
+                User user = (User) response.getResponseObject();
+                String serializedUser = new GsonBuilder().create().toJson(user);
+                successCallback.invoke(serializedUser);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
-                errorCallback.invoke(errorResponse);
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
             }
         });
     }
