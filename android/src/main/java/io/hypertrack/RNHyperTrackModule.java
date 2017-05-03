@@ -37,12 +37,14 @@ import com.hypertrack.lib.models.ActionParams;
 import com.hypertrack.lib.models.ActionParamsBuilder;
 import com.hypertrack.lib.models.ErrorResponse;
 import com.hypertrack.lib.models.SuccessResponse;
+import com.hypertrack.lib.models.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class RNHyperTrackModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
