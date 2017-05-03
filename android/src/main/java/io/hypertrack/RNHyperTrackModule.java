@@ -37,12 +37,14 @@ import com.hypertrack.lib.models.ActionParams;
 import com.hypertrack.lib.models.ActionParamsBuilder;
 import com.hypertrack.lib.models.ErrorResponse;
 import com.hypertrack.lib.models.SuccessResponse;
+import com.hypertrack.lib.models.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class RNHyperTrackModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
@@ -90,12 +92,15 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
-                successCallback.invoke(response.getResponseObject());
+                User user = (User) response.getResponseObject();
+                String serializedUser = new GsonBuilder().create().toJson(user);
+                successCallback.invoke(serializedUser);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
-                errorCallback.invoke(errorResponse);
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
             }
         });
     }
