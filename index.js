@@ -15,7 +15,7 @@ module.exports = {
 
     // create a new user
     createUser(name, successCallback, errorCallback) {
-        RNHyperTrack.createUser(driverId, successCallback, errorCallback);
+        RNHyperTrack.createUser(name, successCallback, errorCallback);
     },
 
     // set a user with id
