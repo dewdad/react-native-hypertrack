@@ -33,6 +33,7 @@ import com.hypertrack.lib.callbacks.HyperTrackCallback;
 import com.hypertrack.lib.callbacks.HyperTrackEventCallback;
 import com.hypertrack.lib.internal.transmitter.models.HyperTrackEvent;
 import com.hypertrack.lib.models.Place;
+import com.hypertrack.lib.models.Action;
 import com.hypertrack.lib.models.ActionParams;
 import com.hypertrack.lib.models.ActionParamsBuilder;
 import com.hypertrack.lib.models.ErrorResponse;
@@ -121,9 +122,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
-                User user = (User) response.getResponseObject();
-                String serializedUser = new GsonBuilder().create().toJson(user);
-                successCallback.invoke(serializedUser);
+                String userId = (String) response.getResponseObject();
+                successCallback.invoke(userId);
             }
 
             @Override
@@ -141,19 +141,22 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
 
     @ReactMethod
     public void createAndAssignAction(final Callback successCallback, final Callback errorCallback) {
-        // TODO
+        // TODO - add expected place support
         ActionParams actionParams = new ActionParamsBuilder().build();
 
         HyperTrack.createAndAssignAction(actionParams, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
-                // Return User object in successCallback
-                successCallback.invoke(response.getResponseObject());
+                // Return Action object in successCallback
+                Action action = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(action);
+                successCallback.invoke(serializedAction);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
-                errorCallback.invoke(errorResponse);
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
             }
         });
     }
@@ -178,20 +181,6 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
 
     @Override
     public void onHostResume() { }
-
-    private ArrayList<String> toArrayList(ReadableArray taskIDs) {
-        ArrayList<String> arrayList = new ArrayList<>();
-        for (int i = 0; i < taskIDs.size(); i++) {
-            switch (taskIDs.getType(i)) {
-                case String:
-                    arrayList.add(taskIDs.getString(i));
-                    break;
-                default:
-                    throw new IllegalArgumentException("Task ID at index " + i + " should be String");
-            }
-        }
-        return arrayList;
-    }
 
     private void sendEvent(String eventName, WritableMap params) {
         getReactApplicationContext()
