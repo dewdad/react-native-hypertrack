@@ -15,7 +15,7 @@ module.exports = {
 
     // get or create a new user
     getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback) {
-        RNHyperTrack.createUser(name, phoneNumber, lookupId, successCallback, errorCallback);
+        RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback);
     },
 
     // set a user with id
