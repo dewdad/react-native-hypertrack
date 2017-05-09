@@ -13,9 +13,9 @@ module.exports = {
         RNHyperTrack.getPublishableKey(callback);
     },
 
-    // create a new user
-    createUser(name, successCallback, errorCallback) {
-        RNHyperTrack.createUser(name, successCallback, errorCallback);
+    // get or create a new user
+    getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback) {
+        RNHyperTrack.createUser(name, phoneNumber, lookupId, successCallback, errorCallback);
     },
 
     // set a user with id

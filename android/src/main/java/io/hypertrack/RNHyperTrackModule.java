@@ -88,8 +88,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void createUser(String userName, final Callback successCallback, final Callback errorCallback) {
-        HyperTrack.createUser(userName, new HyperTrackCallback() {
+    public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Callback successCallback, final Callback errorCallback) {
+        HyperTrack.getOrCreateUser(userName, phoneNumber, lookupId, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
