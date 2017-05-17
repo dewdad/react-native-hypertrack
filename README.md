@@ -59,6 +59,8 @@ The v1.x wrapper is built for HyperTrack v3, and will not work with the older SD
 
 3. Open the iOS project with **.xcworkspace** file in Xcode. Move the `ios/RNHyperTrack.h` and `ios/RNHyperTrack.m` files to your project as shown below.
 
+![iOS link](link.gif)
+
 4. Import inside Javascript.
     ```js
     import { NativeModules } from 'react-native';
