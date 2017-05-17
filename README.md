@@ -4,45 +4,46 @@ React native module for hypertrack-android and hypertrack-ios SDKs. Methods in t
 [![Slack Status](http://slack.hypertrack.io/badge.svg)](http://slack.hypertrack.io) [![npm version](https://badge.fury.io/js/react-native-hypertrack.svg)](https://badge.fury.io/js/react-native-hypertrack)
 
 ## What's new in v1.x
-The v1.x wrapper is built for HyperTrack v3, and will not work with the older SDKs. There will be breaking changes if you are upgrading - please refer to [docs.hypertrack.com](https://docs.hypertrack.com).
+The v1.x wrapper is built for HyperTrack v3, and will not work with the older SDKs. There will be breaking changes if you are upgrading. Please refer to [docs.hypertrack.com](https://docs.hypertrack.com).
 
-## Getting started
-In your project directory, install and link the module package from npm.
-```
-$ npm install react-native-hypertrack --save
-$ react-native link react-native-hypertrack
-```
-
-If you are using an older version of React Native that does not support `link`, you can [manually link](https://facebook.github.io/react-native/docs/linking-libraries-ios.html) libraries.
-
-### Android setup
-To use the HyperTrack Android SDKs, the following urls need to be added to your `android/build.gradle` file. This will configure the repository urls for the SDKs.
-
-```
-allprojects {
-    repositories {
-        ...
-        maven { url 'http://hypertrack-android-sdk.s3-website-us-west-2.amazonaws.com/' }
-        maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
-    }
-}
-```
-
-If you have some issues with Android, some common troubleshooting is [here](android-troubleshooting.md).
-
-### iOS setup
-1. The native iOS SDKs need to be setup using Cocoapods. In your project's `ios` directory, create a Podfile.
+## Getting started - Android
+1. In your project directory, install and link the module package from npm.
+    ```bash
+    $ npm install react-native-hypertrack --save
+    $ react-native link react-native-hypertrack
     ```
+
+2. To use the HyperTrack Android SDKs, the following urls need to be added to your `android/build.gradle` file. This will configure the repository urls for the SDKs.
+
+    ```groovy
+    allprojects {
+        repositories {
+            ...
+            maven { url 'http://hypertrack-android-sdk.s3-website-us-west-2.amazonaws.com/' }
+            maven { url 'https://repo.eclipse.org/content/repositories/paho-releases/' }
+        }
+    }
+    ```
+    
+3. Import inside Javascript
+    ```js
+    import RNHyperTrack from 'react-native-hypertrack';
+    ```
+
+## Getting started - iOS
+1. The native iOS SDKs need to be setup using Cocoapods. In your project's `ios` directory, create a Podfile.
+    ```bash
     $ cd ios
     $ pod init
     ```
 
 2. Edit the Podfile to include `HyperTrack` as a dependency for your project, and then install the pod with `pod install`.
-    ```
+    ```ruby
     use_frameworks!
     platform :ios, '9.0'
 
     target 'AwesomeProject' do
+
       # Pods for AwesomeProject
       pod 'HyperTrack'
 
@@ -56,25 +57,30 @@ If you have some issues with Android, some common troubleshooting is [here](andr
     end
     ```
 
-3. Now, open the iOS project with the `.xcworkspace` file in Xcode, and add the native SDK `.a` files in the linked frameworks and libraries section. You need to add *libHTTransmitter.a*, *libHTCommon.a*, *libMQTTClient.a*.
-![Linked frameworks and libraries](readme-imgs/linker.png)
+3. Open the iOS project with **.xcworkspace** file in Xcode. Move the `ios/RNHyperTrack.h` and `ios/RNHyperTrack.m` files to your project as shown below.
 
-## Usage
+4. Import inside Javascript.
+    ```js
+    import { NativeModules } from 'react-native';
+    var RNHyperTrack = NativeModules.RNHyperTrack;
+    ```
+
+## API usage
 
 #### 1. Initialize the SDK
 
 ```javascript
- import RNHyperTrack from 'react-native-hypertrack';
- ...
+import RNHyperTrack from 'react-native-hypertrack';
+...
 
- export default class MyApp extends Component {
-   constructor() {
-     super();
-     // Initialize HyperTrack wrapper
-     RNHyperTrack.initialize("YOUR_PUBLISHABLE_KEY");
-   }
- }
-  ...
+export default class MyApp extends Component {
+  constructor() {
+   super();
+   // Initialize HyperTrack wrapper
+   RNHyperTrack.initialize("YOUR_PUBLISHABLE_KEY");
+  }
+}
+...
 ```
 
 #### 2. Set or create user
