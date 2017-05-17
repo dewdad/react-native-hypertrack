@@ -1,9 +1,13 @@
-#import <Foundation/Foundation.h>
 
-#import <React/RCTBridgeModule.h>
+#import "RNHyperTrack.h"
 
-@interface RCT_EXTERN_MODULE(RNHyperTrack, NSObject)
+@implementation RNHyperTrack
 
-RCT_EXTERN_METHOD(addEvent:(NSString *)name location:(NSString *)location date:(nonnull NSNumber *)date callback: (RCTResponseSenderBlock)callback);
+- (dispatch_queue_t)methodQueue
+{
+    return dispatch_get_main_queue();
+}
+RCT_EXPORT_MODULE()
 
 @end
+  
