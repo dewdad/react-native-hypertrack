@@ -53,11 +53,11 @@ The v1.x wrapper is built for HyperTrack v3, and will not work with the older SD
                     config.build_settings['SWIFT_VERSION'] = '3.0'
                 end
             end
-      end
+      end`
     end
     ```
 
-3. Open the iOS project with **.xcworkspace** file in Xcode. Move the `ios/RNHyperTrack.h` and `ios/RNHyperTrack.m` files to your project as shown below.
+3. Open the iOS project with **.xcworkspace** file in Xcode. Move the `_ios/RNHyperTrack.h` and `_ios/RNHyperTrack.m` files to your project as shown below.
 
 ![iOS link](link.gif)
 
