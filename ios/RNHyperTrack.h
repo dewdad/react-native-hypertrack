@@ -1,7 +1,6 @@
 
-#import "RCTBridgeModule.h"
+#import <React/RCTBridgeModule.h>
 
 @interface RNHyperTrack : NSObject <RCTBridgeModule>
 
 @end
-  
