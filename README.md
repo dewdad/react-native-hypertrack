@@ -53,7 +53,7 @@ The v1.x wrapper is built for HyperTrack v3, and will not work with the older SD
                     config.build_settings['SWIFT_VERSION'] = '3.0'
                 end
             end
-      end`
+      end
     end
     ```
 
