@@ -18,6 +18,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -141,14 +142,14 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
 
     @ReactMethod
     public void createAndAssignAction(ReadableMap params, final Callback successCallback, final Callback errorCallback) {
-        ActionParams actionParamsBuilder = new ActionParamsBuilder();
+        ActionParamsBuilder actionParamsBuilder = new ActionParamsBuilder();
 
         if (params.hasKey("expected_place_id")) {
-            actionParams.setExpectedPlaceId(params.getString("expected_place_id"));
+            actionParamsBuilder.setExpectedPlaceId(params.getString("expected_place_id"));
         }
 
         if (params.hasKey("lookup_id")) {
-            actionParams.setLookupId(params.hasString("lookup_id"));
+            actionParamsBuilder.setLookupId(params.hasString("lookup_id"));
         }
 
         // TODO: add for expected_at and type
