@@ -140,11 +140,19 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void createAndAssignAction(final Callback successCallback, final Callback errorCallback) {
-        // TODO - add expected place support
-        ActionParams actionParams = new ActionParamsBuilder().build();
+    public void createAndAssignAction(ReadableMap params, final Callback successCallback, final Callback errorCallback) {
+        ActionParams actionParamsBuilder = new ActionParamsBuilder()
 
-        HyperTrack.createAndAssignAction(actionParams, new HyperTrackCallback() {
+        if (params.hasKey("expected_place_id")) {
+            actionParams.setExpectedPlaceId(params.getString("expected_place_id"));
+        }
+
+        if (params.hasKey("lookup_id")) {
+            actionParams.setLookupId(params.hasString("lookup_id"));
+        }
+
+        // TODO: add for expected_at and type
+        HyperTrack.createAndAssignAction(actionParamsBuilder.build(), new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return Action object in successCallback

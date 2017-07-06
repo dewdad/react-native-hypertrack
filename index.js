@@ -45,7 +45,11 @@ module.exports = {
 
     // create and assign action
     createAndAssignAction(actionParams, successCallback, errorCallback) {
-        // actionParams is a dictionary with keys
+        // actionParams is a dictionary with following keys
+        // expected_at: ISO datetime string
+        // expected_place_id: uuid of expected place
+        // lookup_id: string object for action lookup id
+        // type: string object, that can be one of "visit", "pickup", "delivery"
         RNHyperTrack.createAndAssignAction(actionParams, successCallback, errorCallback);
     },
 
