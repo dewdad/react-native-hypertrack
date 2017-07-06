@@ -117,6 +117,11 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params :(RCTResponseSe
 }
 
 
+RCT_EXPORT_METHOD(completeAction :(NSString *)actionId) {
+  [HyperTrack completeAction:actionId];
+}
+
+
 RCT_EXPORT_METHOD(isTracking :(RCTResponseSenderBlock) callback)
 {
   callback(@[[NSNumber numberWithBool:[HyperTrack isTracking]]]);
