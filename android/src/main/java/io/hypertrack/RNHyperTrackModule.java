@@ -31,6 +31,7 @@ import com.hypertrack.lib.HyperTrackConstants;
 import com.hypertrack.lib.callbacks.HyperTrackCallback;
 import com.hypertrack.lib.callbacks.HyperTrackEventCallback;
 import com.hypertrack.lib.internal.transmitter.models.HyperTrackEvent;
+import com.hypertrack.lib.internal.common.util.DateTimeUtility;
 import com.hypertrack.lib.models.Place;
 import com.hypertrack.lib.models.Action;
 import com.hypertrack.lib.models.GeoJSONLocation;
@@ -150,6 +151,14 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
 
         if (params.hasKey("lookup_id")) {
             actionParamsBuilder.setLookupId(params.getString("lookup_id"));
+        }
+
+        if (params.hasKey("type")) {
+            actionParamsBuilder.setType(params.getString("type"));
+        }
+
+        if (params.hasKey("expected_at")) {
+            actionParamsBuilder.setExpectedAt(DateTimeUtility.getFormattedDate(params.getString("expected_at")));
         }
 
         // TODO: add for expected_at and type
