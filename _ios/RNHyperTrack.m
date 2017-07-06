@@ -47,7 +47,7 @@ RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSStrin
       failure(@[error]);
     } else {
       if (user) {
-        success(@[user]);
+        success(@[[user toJson]]);
       }
     }
   }];
@@ -110,8 +110,7 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params :(RCTResponseSe
                                      
                                      if (action) {
                                        // Handle createAndAssignAction API success here
-                                       // TODO: response object
-                                       success(@[]);
+                                       success(@[[action toJson]]);
                                      }
                                    }];
   
