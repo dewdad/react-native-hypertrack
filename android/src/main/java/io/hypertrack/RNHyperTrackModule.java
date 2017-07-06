@@ -141,7 +141,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
 
     @ReactMethod
     public void createAndAssignAction(ReadableMap params, final Callback successCallback, final Callback errorCallback) {
-        ActionParams actionParamsBuilder = new ActionParamsBuilder()
+        ActionParams actionParamsBuilder = new ActionParamsBuilder();
 
         if (params.hasKey("expected_place_id")) {
             actionParams.setExpectedPlaceId(params.getString("expected_place_id"));
