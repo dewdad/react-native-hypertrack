@@ -22,13 +22,8 @@
 - (void) didReceiveEvent:(HyperTrackEvent *)event {
   // HyperTrack delegate method
   // Process events
-  if (event.eventType == HyperTrackEventTypeStopStarted) {
-    [self sendEventWithName:@"location.changed" body:@{@"geojson": @"test 1"}];
-  }
-  
-  if (event.eventType == HyperTrackEventTypeLocationChanged) {
-    // Location changed event
-    [self sendEventWithName:@"location.changed" body:@{@"geojson": @"test"}];
+  if (event.location != nil) {
+    [self sendEventWithName:@"location.changed" body:@{@"geojson": [event.location.location toJson]}];
   }
 }
   
