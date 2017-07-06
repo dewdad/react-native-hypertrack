@@ -5,11 +5,9 @@ import android.widget.Toast;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.BroadcastReceiver;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -35,6 +33,7 @@ import com.hypertrack.lib.callbacks.HyperTrackEventCallback;
 import com.hypertrack.lib.internal.transmitter.models.HyperTrackEvent;
 import com.hypertrack.lib.models.Place;
 import com.hypertrack.lib.models.Action;
+import com.hypertrack.lib.models.GeoJSONLocation;
 import com.hypertrack.lib.models.ActionParams;
 import com.hypertrack.lib.models.ActionParamsBuilder;
 import com.hypertrack.lib.models.ErrorResponse;
@@ -51,18 +50,19 @@ import com.google.gson.GsonBuilder;
 public class RNHyperTrackModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
     private final ReactApplicationContext reactContext;
-    private final StatusBroadcastReceiver mStatusBroadcastReceiver;
 
     public RNHyperTrackModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        this.mStatusBroadcastReceiver = new StatusBroadcastReceiver();
 
         // Set Callback to receive events & errors
         HyperTrack.setCallback(new HyperTrackEventCallback() {
             @Override
             public void onEvent(@NonNull final HyperTrackEvent event) {
                 // handle event received here
+                if (event.getEventType() == HyperTrackEvent.EventType.LOCATION_CHANGED_EVENT) {
+                    sendLocationChangedEvent(event);
+                }
             }
 
             @Override
@@ -149,7 +149,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         }
 
         if (params.hasKey("lookup_id")) {
-            actionParamsBuilder.setLookupId(params.hasString("lookup_id"));
+            actionParamsBuilder.setLookupId(params.getString("lookup_id"));
         }
 
         // TODO: add for expected_at and type
@@ -182,7 +182,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
 
     @Override
     public void onHostDestroy() {
-        LocalBroadcastManager.getInstance(getReactApplicationContext()).unregisterReceiver(mStatusBroadcastReceiver);
+        //
     }
 
     @Override
@@ -197,13 +197,12 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
                 .emit(eventName, params);
     }
 
-    private class StatusBroadcastReceiver extends BroadcastReceiver {
-        private StatusBroadcastReceiver() { }
-
-        public void onReceive(Context paramContext, Intent paramIntent) {
-             if (paramIntent.getAction().equals(HyperTrackConstants.HT_USER_CURRENT_LOCATION_INTENT)) {
-                 // TODO - send current location
-             }
-        }
+    private void sendLocationChangedEvent(final HyperTrackEvent event) {
+        // Send this event to js
+        GeoJSONLocation geojson = event.getLocation().getGeoJSONLocation();
+        String serializedGeojson = new GsonBuilder().create().toJson(geojson);
+        WritableMap params = Arguments.createMap();
+        params.putString("geojson", serializedGeojson);
+        sendEvent("location.changed", params);
     }
 }
