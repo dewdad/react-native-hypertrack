@@ -122,6 +122,25 @@ RCT_EXPORT_METHOD(completeAction :(NSString *)actionId) {
 }
 
 
+RCT_EXPORT_METHOD(getAction :(NSString *)actionId :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+{
+  [HyperTrack getAction:actionId
+      completionHandler:^(HyperTrackAction * _Nullable action,
+                          HyperTrackError * _Nullable error) {
+        if (error) {
+          // Handle error and call failure callback
+          failure(@[error]);
+          return;
+        }
+        
+        if (action) {
+          // Send action to success callback
+          success(@[[action toJson]]);
+        }
+      }];
+}
+
+
 RCT_EXPORT_METHOD(isTracking :(RCTResponseSenderBlock) callback)
 {
   callback(@[[NSNumber numberWithBool:[HyperTrack isTracking]]]);

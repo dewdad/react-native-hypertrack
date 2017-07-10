@@ -179,6 +179,26 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
+    public void getAction(String actionId, final Callback successCallback, final Callback errorCallback) {
+        HyperTrack.getAction(actionId, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                successCallback.invoke(serializedAction);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
     public void completeAction(String actionId) {
         HyperTrack.completeAction(actionId);
     }
