@@ -185,7 +185,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Handle getAction response here
                 Action actionResponse = (Action) response.getResponseObject();
-                String serializedAction = new GsonBuilder().create().toJson(action);
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
                 successCallback.invoke(serializedAction);
             }
 
