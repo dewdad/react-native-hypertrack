@@ -199,6 +199,27 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
+    public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, 
+            final Callback successCallback, final Callback errorCallback) {
+        LatLng expectedLocation = new LatLng(expectedPlaceLat, expectedPlaceLng);
+        HyperTrack.getETA(expectedLocation, new VehicleType(vehicleType), new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getETA API success here
+                Double eta = (Double) response.getResponseObject();
+                successCallback.invoke(eta);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getETA API error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
     public void completeAction(String actionId) {
         HyperTrack.completeAction(actionId);
     }

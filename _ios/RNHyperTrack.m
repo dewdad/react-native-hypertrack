@@ -140,7 +140,6 @@ RCT_EXPORT_METHOD(getAction :(NSString *)actionId :(RCTResponseSenderBlock) succ
       }];
 }
 
-
 RCT_EXPORT_METHOD(isTracking :(RCTResponseSenderBlock) callback)
 {
   callback(@[[NSNumber numberWithBool:[HyperTrack isTracking]]]);
