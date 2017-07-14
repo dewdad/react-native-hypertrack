@@ -233,7 +233,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             actionIdsStrings.add(actionIds.getString(i));
         }
 
-        HyperTrack.assignAction(actionIdsStrings, new HyperTrackCallback() {
+        HyperTrack.assignActions(actionIdsStrings, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
