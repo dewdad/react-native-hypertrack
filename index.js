@@ -53,6 +53,11 @@ module.exports = {
         RNHyperTrack.createAndAssignAction(actionParams, successCallback, errorCallback);
     },
 
+    // Method to assign action
+    assignActions(actionIds, successCallback, errorCallback) {
+        RNHyperTrack.assignActions(actionIds, successCallback, errorCallback)
+    },
+
     // get details of an action
     getAction(actionId, successCallback, errorCallback) {
         RNHyperTrack.getAction(actionId, successCallback, errorCallback);
@@ -61,5 +66,11 @@ module.exports = {
     // Method to complete an action
     completeAction(actionId) {
         RNHyperTrack.completeAction(actionId);
+    },
+
+    // Method to get eta to an expected location
+    // Vehicle type can be "car", "bicycle", "van"
+    getETA(latitude, longitude, vehicleType, successCallback, errorCallback) {
+        RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
     }
 }

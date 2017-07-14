@@ -24,6 +24,7 @@ import com.facebook.react.bridge.LifecycleEventListener;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ArrayList;
 
 import com.hypertrack.lib.HyperTrack;
@@ -32,6 +33,7 @@ import com.hypertrack.lib.callbacks.HyperTrackCallback;
 import com.hypertrack.lib.callbacks.HyperTrackEventCallback;
 import com.hypertrack.lib.internal.transmitter.models.HyperTrackEvent;
 import com.hypertrack.lib.internal.common.util.DateTimeUtility;
+import com.hypertrack.lib.internal.common.models.VehicleType;
 import com.hypertrack.lib.models.Place;
 import com.hypertrack.lib.models.Action;
 import com.hypertrack.lib.models.GeoJSONLocation;
@@ -47,6 +49,8 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class RNHyperTrackModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
@@ -192,6 +196,55 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, 
+            final Callback successCallback, final Callback errorCallback) {
+        LatLng expectedLocation = new LatLng(expectedPlaceLat, expectedPlaceLng);
+        VehicleType vType = VehicleType.valueOf(vehicleType.toUpperCase());
+
+        HyperTrack.getETA(expectedLocation, vType, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getETA API success here
+                Double eta = (Double) response.getResponseObject();
+                successCallback.invoke(eta);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getETA API error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void assignActions(final ReadableArray actionIds, final Callback successCallback, final Callback errorCallback) {
+        List<String> actionIdsStrings = new ArrayList<String>();
+
+        for (int i = 0; i < actionIds.size(); i++) {
+            actionIdsStrings.add(actionIds.getString(i));
+        }
+
+        HyperTrack.assignActions(actionIdsStrings, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Return User object in successCallback
+                User user = (User) response.getResponseObject();
+                String serializedUser = new GsonBuilder().create().toJson(user);
+                successCallback.invoke(serializedUser);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getETA API error here
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
                 errorCallback.invoke(serializedError);
             }
