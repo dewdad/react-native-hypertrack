@@ -61,5 +61,11 @@ module.exports = {
     // Method to complete an action
     completeAction(actionId) {
         RNHyperTrack.completeAction(actionId);
+    },
+
+    // Method to get eta to an expected location
+    // Vehicle type can be "car", "bicycle", "van"
+    getETA(latitude, longitude, vehicleType, successCallback, errorCallback) {
+        RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
     }
 }

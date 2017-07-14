@@ -32,6 +32,7 @@ import com.hypertrack.lib.callbacks.HyperTrackCallback;
 import com.hypertrack.lib.callbacks.HyperTrackEventCallback;
 import com.hypertrack.lib.internal.transmitter.models.HyperTrackEvent;
 import com.hypertrack.lib.internal.common.util.DateTimeUtility;
+import com.hypertrack.lib.internal.common.models.VehicleType;
 import com.hypertrack.lib.models.Place;
 import com.hypertrack.lib.models.Action;
 import com.hypertrack.lib.models.GeoJSONLocation;
@@ -47,6 +48,8 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class RNHyperTrackModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
