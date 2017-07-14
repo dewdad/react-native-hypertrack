@@ -53,6 +53,11 @@ module.exports = {
         RNHyperTrack.createAndAssignAction(actionParams, successCallback, errorCallback);
     },
 
+    // Method to assign action
+    assignActions(actionIds, successCallback, errorCallback) {
+        RNHyperTrack.assignActions(actionIds, successCallback, errorCallback)
+    },
+
     // get details of an action
     getAction(actionId, successCallback, errorCallback) {
         RNHyperTrack.getAction(actionId, successCallback, errorCallback);
