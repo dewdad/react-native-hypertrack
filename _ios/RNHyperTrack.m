@@ -140,6 +140,33 @@ RCT_EXPORT_METHOD(getAction :(NSString *)actionId :(RCTResponseSenderBlock) succ
       }];
 }
 
+
+RCT_EXPORT_METHOD(getETA :(nonnull NSNumber *)latitude :(nonnull NSNumber *)longitude :(NSString *)vehicle :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+{
+  CLLocationCoordinate2D coord;
+  coord.longitude = (CLLocationDegrees)[longitude doubleValue];
+  coord.latitude = (CLLocationDegrees)[latitude doubleValue];
+  
+  [HyperTrack getETAWithExpectedPlaceCoordinates:coord
+                                     vehicleType:vehicle
+                               completionHandler:^(NSNumber * _Nullable eta,
+                                                   HyperTrackError * _Nullable error) {
+                                 if (error) {
+                                   failure(@[error]);
+                                   return;
+                                 }
+                                 
+                                 success(@[eta]);
+                               }];
+}
+
+
+RCT_EXPORT_METHOD(assignActions :(NSArray *)actionIds :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+{
+  // TODO: Assign action API is missing in the sdk
+}
+
+
 RCT_EXPORT_METHOD(isTracking :(RCTResponseSenderBlock) callback)
 {
   callback(@[[NSNumber numberWithBool:[HyperTrack isTracking]]]);
