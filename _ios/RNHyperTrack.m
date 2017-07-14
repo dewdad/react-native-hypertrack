@@ -163,7 +163,18 @@ RCT_EXPORT_METHOD(getETA :(nonnull NSNumber *)latitude :(nonnull NSNumber *)long
 
 RCT_EXPORT_METHOD(assignActions :(NSArray *)actionIds :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
 {
-  // TODO: Assign action API is missing in the sdk
+  [HyperTrack assignActionsWithActionIds:actionIds :^(HyperTrackUser * _Nullable user, HyperTrackError * _Nullable error) {
+    
+    if (error) {
+      failure(@[error]);
+      return;
+    }
+    
+    if (user) {
+      success(@[[user toJson]]);
+    }
+    
+  }];
 }
 
 
