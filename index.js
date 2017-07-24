@@ -47,7 +47,7 @@ module.exports = {
     },
 
     // Method to get eta to an expected location
-    // Vehicle type can be "car", "bicycle", "van"
+    // Vehicle type can be "car", "bicycle", "van", "walking", "three-wheeler", "motorcycle"
     getETA(latitude, longitude, vehicleType, successCallback, errorCallback) {
         RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
     },

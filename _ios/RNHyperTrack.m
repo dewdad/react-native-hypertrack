@@ -130,9 +130,9 @@ RCT_EXPORT_METHOD(getCurrentLocation :(RCTResponseSenderBlock) success :(RCTResp
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.coordinate.latitude] forKey:@"latitude"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.coordinate.longitude] forKey:@"longitude"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.altitude] forKey:@"altitude"];
-    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.horizontalAccuracy] forKey:@"horizontalAccuracy"];
+    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.horizontalAccuracy] forKey:@"accuracy"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.verticalAccuracy] forKey:@"verticalAccuracy"];
-    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.verticalAccuracy] forKey:@"course"];
+    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.course] forKey:@"bearing"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.speed] forKey:@"speed"];
                                  
     success(@[locationMap]);
