@@ -82,6 +82,29 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         return "RNHyperTrack";
     }
 
+    /**
+    * HyperTrackEvent methods
+    **/
+
+    private void sendEvent(String eventName, WritableMap params) {
+        getReactApplicationContext()
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, params);
+    }
+
+    private void sendLocationChangedEvent(final HyperTrackEvent event) {
+        // Send this event to js
+        GeoJSONLocation geojson = event.getLocation().getGeoJSONLocation();
+        String serializedGeojson = new GsonBuilder().create().toJson(geojson);
+        WritableMap params = Arguments.createMap();
+        params.putString("geojson", serializedGeojson);
+        sendEvent("location.changed", params);
+    }
+
+    /**
+    * Initialization methods
+    **/
+
     @ReactMethod
     public void initialize(String publishableKey) {
         HyperTrack.initialize(getReactApplicationContext(), publishableKey);
@@ -92,6 +115,10 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         Context context = getReactApplicationContext();
         callback.invoke(HyperTrack.getPublishableKey(context));
     }
+
+    /**
+    * Setup methods
+    **/
 
     @ReactMethod
     public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Callback successCallback, final Callback errorCallback) {
@@ -117,10 +144,75 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         HyperTrack.setUserId(userId);
     }
 
+    /**
+    * Util methods
+    **/
+
     @ReactMethod
     public void getUserId(final Callback callback) {
         callback.invoke(HyperTrack.getUserId());
     }
+
+    @ReactMethod
+    public void isTracking(final Callback callback) {
+        callback.invoke(HyperTrack.isTracking());
+    }
+
+    @ReactMethod
+    public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, 
+            final Callback successCallback, final Callback errorCallback) {
+        LatLng expectedLocation = new LatLng(expectedPlaceLat, expectedPlaceLng);
+        VehicleType vType = VehicleType.valueOf(vehicleType.toUpperCase());
+
+        HyperTrack.getETA(expectedLocation, vType, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getETA API success here
+                Double eta = (Double) response.getResponseObject();
+                successCallback.invoke(eta);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getETA API error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getCurrentLocation(final Callback successCallback, final Callback errorCallback) {
+        HyperTrack.getCurrentLocation(new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getCurrentLocation API success here
+                Location location = (Location) response.getResponseObject();
+                
+                WritableMap locationMap = Arguments.createMap();
+                locationMap.putDouble("latitude", location.getLatitude());
+                locationMap.putDouble("longitude", location.getLongitude());
+                locationMap.putString("provider", location.getProvider());
+                locationMap.putDouble("speed", (double) location.getSpeed());
+                locationMap.putDouble("accuracy", (double) location.getAccuracy());
+                locationMap.putDouble("bearing", (double) location.getBearing());
+                locationMap.putDouble("altitude", location.getAltitude());
+
+                successCallback.invoke(locationMap);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getETA API error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
+            }
+        });
+    }
+
+    /**
+    * Basic integration methods
+    **/
 
     @ReactMethod
     public void startTracking(final Callback successCallback, final Callback errorCallback) {
@@ -141,9 +233,13 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void isTracking(final Callback callback) {
-        callback.invoke(HyperTrack.isTracking());
+    public void stopTracking() {
+        HyperTrack.stopTracking();
     }
+
+    /**
+    * Action methods
+    **/
 
     @ReactMethod
     public void createAndAssignAction(ReadableMap params, final Callback successCallback, final Callback errorCallback) {
@@ -183,49 +279,6 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void getAction(String actionId, final Callback successCallback, final Callback errorCallback) {
-        HyperTrack.getAction(actionId, new HyperTrackCallback() {
-            @Override
-            public void onSuccess(@NonNull SuccessResponse response) {
-                // Handle getAction response here
-                Action actionResponse = (Action) response.getResponseObject();
-                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
-                successCallback.invoke(serializedAction);
-            }
-
-            @Override
-            public void onError(@NonNull ErrorResponse errorResponse) {
-                // Handle getAction error here
-                String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
-            }
-        });
-    }
-
-    @ReactMethod
-    public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, 
-            final Callback successCallback, final Callback errorCallback) {
-        LatLng expectedLocation = new LatLng(expectedPlaceLat, expectedPlaceLng);
-        VehicleType vType = VehicleType.valueOf(vehicleType.toUpperCase());
-
-        HyperTrack.getETA(expectedLocation, vType, new HyperTrackCallback() {
-            @Override
-            public void onSuccess(@NonNull SuccessResponse response) {
-                // Handle getETA API success here
-                Double eta = (Double) response.getResponseObject();
-                successCallback.invoke(eta);
-            }
-
-            @Override
-            public void onError(@NonNull ErrorResponse errorResponse) {
-                // Handle getETA API error here
-                String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
-            }
-        });
-    }
-
-    @ReactMethod
     public void assignActions(final ReadableArray actionIds, final Callback successCallback, final Callback errorCallback) {
         List<String> actionIdsStrings = new ArrayList<String>();
 
@@ -252,38 +305,36 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
+    public void getAction(String actionId, final Callback successCallback, final Callback errorCallback) {
+        HyperTrack.getAction(actionId, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                successCallback.invoke(serializedAction);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                errorCallback.invoke(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
     public void completeAction(String actionId) {
         HyperTrack.completeAction(actionId);
     }
 
-    @ReactMethod
-    public void stopTracking() {
-        HyperTrack.stopTracking();
-    }
-
     @Override
-    public void onHostDestroy() {
-        //
-    }
+    public void onHostDestroy() { }
 
     @Override
     public void onHostPause() { }
 
     @Override
     public void onHostResume() { }
-
-    private void sendEvent(String eventName, WritableMap params) {
-        getReactApplicationContext()
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
-    }
-
-    private void sendLocationChangedEvent(final HyperTrackEvent event) {
-        // Send this event to js
-        GeoJSONLocation geojson = event.getLocation().getGeoJSONLocation();
-        String serializedGeojson = new GsonBuilder().create().toJson(geojson);
-        WritableMap params = Arguments.createMap();
-        params.putString("geojson", serializedGeojson);
-        sendEvent("location.changed", params);
-    }
 }
