@@ -198,7 +198,7 @@ RCT_EXPORT_METHOD(getCurrentLocation :(RCTResponseSenderBlock) success :(RCTResp
   [HyperTrack getCurrentLocationWithCompletionHandler:^(CLLocation * _Nullable currentLocation,
                                                    HyperTrackError * _Nullable error) {
     if (error) {
-      failure(@[error]);
+      failure(@[[error toJson]]);
       return;
     }
 
