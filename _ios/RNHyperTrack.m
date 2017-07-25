@@ -3,6 +3,7 @@
 #import <React/RCTLog.h>
 #import <React/RCTEventDispatcher.h>
 #import <CoreLocation/CoreLocation.h>
+#import <CoreLocation/CLLocationManager.h>
 @import HyperTrack;
 
 @implementation RNHyperTrack
@@ -78,6 +79,81 @@ RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSStrin
 RCT_EXPORT_METHOD(setUserId :(NSString *)userId)
 {
   [HyperTrack setUserId:userId];
+}
+
+
+/**
+ Location Authorization methods
+*/
+
+
+RCT_EXPORT_METHOD(locationAuthorizationStatus :(RCTResponseSenderBlock) callback)
+{
+  CLAuthorizationStatus locationAuthorizationStatus = [HyperTrack locationAuthorizationStatus];
+  switch (locationAuthorizationStatus) {
+    default:
+    case kCLAuthorizationStatusNotDetermined:
+      callback(@[@"notDetermined"]);
+      break;
+    case kCLAuthorizationStatusRestricted:
+      callback(@[@"restricted"]);
+      break;
+    case kCLAuthorizationStatusDenied:
+      callback(@[@"denied"]);
+      break;
+    case kCLAuthorizationStatusAuthorizedAlways:
+      callback(@[@"authorizedAlways"]);
+      break;
+    case kCLAuthorizationStatusAuthorizedWhenInUse:
+      callback(@[@"authorizedWhenInUse"]);
+      break;
+  }
+}
+
+
+RCT_EXPORT_METHOD(requestWhenInUseAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage)
+{
+  [HyperTrack requestWhenInUseAuthorization];
+}
+
+
+RCT_EXPORT_METHOD(requestLocationAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage)
+{
+  [HyperTrack requestAlwaysAuthorization];
+}
+
+
+/**
+ Location Services methods
+*/
+
+
+RCT_EXPORT_METHOD(locationServicesEnabled :(RCTResponseSenderBlock) callback)
+{
+  callback(@[[NSNumber numberWithBool:[HyperTrack locationServicesEnabled]]]);
+}
+
+
+RCT_EXPORT_METHOD(requestLocationServices)
+{
+  [HyperTrack requestLocationServices];
+}
+
+
+/**
+ Motion Authorization methods
+*/
+
+
+RCT_EXPORT_METHOD(canAskMotionPermissions :(RCTResponseSenderBlock) callback)
+{
+  callback(@[[NSNumber numberWithBool:[HyperTrack canAskMotionPermissions]]]);
+}
+
+
+RCT_EXPORT_METHOD(requestMotionAuthorization)
+{
+  [HyperTrack requestMotionAuthorization];
 }
 
 

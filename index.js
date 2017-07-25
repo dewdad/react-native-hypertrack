@@ -100,5 +100,45 @@ module.exports = {
     // Method to complete an action
     completeAction(actionId) {
         RNHyperTrack.completeAction(actionId);
+    },
+
+    /**
+     Location Authorization (or Permission) methods
+    */
+
+    locationAuthorizationStatus(callback) {
+        RNHyperTrack.locationAuthorizationStatus(callback);
+    },
+
+    requestLocationWhenInUseAuthorization(rationaleTitle, rationaleMessage) {
+        RNHyperTrack.requestWhenInUseAuthorization(rationaleTitle, rationaleMessage);
+    },
+
+    requestLocationAuthorization(rationaleTitle, rationaleMessage) {
+        RNHyperTrack.requestLocationAuthorization(rationaleTitle, rationaleMessage);
+    },
+
+    /**
+     Location services methods
+    */
+
+    locationServicesEnabled(callback) {
+        RNHyperTrack.locationServicesEnabled(callback);
+    },
+
+    requestLocationServices() {
+        RNHyperTrack.requestLocationServices();
+    },
+
+    /**
+     Motion Authorization methods (** For iOS only **)
+    */
+
+    canAskMotionPermissions(callback) {
+        RNHyperTrack.canAskMotionPermissions(callback);
+    },
+
+    requstMotionAuthorization() {
+        RNHyperTrack.requstMotionAuthorization();
     }
 }
