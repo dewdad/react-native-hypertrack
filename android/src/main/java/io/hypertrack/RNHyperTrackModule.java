@@ -145,6 +145,39 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
+    * Location permission methods
+    **/
+   
+    @ReactMethod
+    public void locationAuthorizationStatus(final Callback callback) {
+        callback.invoke(HyperTrack.checkLocationPermission(reactContext));
+    }
+
+    @ReactMethod
+    public void requestWhenInUseAuthorization(String rationaleTitle, String rationaleMessage) {
+        HyperTrack.requestPermissions(getCurrentActivity(), rationaleTitle, rationaleMessage);
+    }
+
+    @ReactMethod
+    public void requestLocationAuthorization(String rationaleTitle, String rationaleMessage) {
+        HyperTrack.requestPermissions(getCurrentActivity(), rationaleTitle, rationaleMessage);
+    }
+
+    /**
+    * Location services methods
+    **/
+
+    @ReactMethod
+    public void locationServicesEnabled(final Callback callback) {
+        callback.invoke(HyperTrack.checkLocationServices(reactContext));
+    }
+
+    @ReactMethod
+    public void requestLocationServices() {
+        HyperTrack.requestLocationServices(getCurrentActivity());
+    }
+
+    /**
     * Util methods
     **/
 

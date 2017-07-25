@@ -3,6 +3,7 @@
 #import <React/RCTLog.h>
 #import <React/RCTEventDispatcher.h>
 #import <CoreLocation/CoreLocation.h>
+#import <CoreLocation/CLLocationManager.h>
 @import HyperTrack;
 
 @implementation RNHyperTrack
@@ -82,6 +83,81 @@ RCT_EXPORT_METHOD(setUserId :(NSString *)userId)
 
 
 /**
+ Location Authorization methods
+*/
+
+
+RCT_EXPORT_METHOD(locationAuthorizationStatus :(RCTResponseSenderBlock) callback)
+{
+  CLAuthorizationStatus locationAuthorizationStatus = [HyperTrack locationAuthorizationStatus];
+  switch (locationAuthorizationStatus) {
+    default:
+    case kCLAuthorizationStatusNotDetermined:
+      callback(@[@"notDetermined"]);
+      break;
+    case kCLAuthorizationStatusRestricted:
+      callback(@[@"restricted"]);
+      break;
+    case kCLAuthorizationStatusDenied:
+      callback(@[@"denied"]);
+      break;
+    case kCLAuthorizationStatusAuthorizedAlways:
+      callback(@[@"authorizedAlways"]);
+      break;
+    case kCLAuthorizationStatusAuthorizedWhenInUse:
+      callback(@[@"authorizedWhenInUse"]);
+      break;
+  }
+}
+
+
+RCT_EXPORT_METHOD(requestWhenInUseAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage)
+{
+  [HyperTrack requestWhenInUseAuthorization];
+}
+
+
+RCT_EXPORT_METHOD(requestLocationAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage)
+{
+  [HyperTrack requestAlwaysAuthorization];
+}
+
+
+/**
+ Location Services methods
+*/
+
+
+RCT_EXPORT_METHOD(locationServicesEnabled :(RCTResponseSenderBlock) callback)
+{
+  callback(@[[NSNumber numberWithBool:[HyperTrack locationServicesEnabled]]]);
+}
+
+
+RCT_EXPORT_METHOD(requestLocationServices)
+{
+  [HyperTrack requestLocationServices];
+}
+
+
+/**
+ Motion Authorization methods
+*/
+
+
+RCT_EXPORT_METHOD(canAskMotionPermissions :(RCTResponseSenderBlock) callback)
+{
+  callback(@[[NSNumber numberWithBool:[HyperTrack canAskMotionPermissions]]]);
+}
+
+
+RCT_EXPORT_METHOD(requestMotionAuthorization)
+{
+  [HyperTrack requestMotionAuthorization];
+}
+
+
+/**
  Util methods
 */
 
@@ -122,7 +198,7 @@ RCT_EXPORT_METHOD(getCurrentLocation :(RCTResponseSenderBlock) success :(RCTResp
   [HyperTrack getCurrentLocationWithCompletionHandler:^(CLLocation * _Nullable currentLocation,
                                                    HyperTrackError * _Nullable error) {
     if (error) {
-      failure(@[error]);
+      failure(@[[error toJson]]);
       return;
     }
 
@@ -130,9 +206,9 @@ RCT_EXPORT_METHOD(getCurrentLocation :(RCTResponseSenderBlock) success :(RCTResp
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.coordinate.latitude] forKey:@"latitude"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.coordinate.longitude] forKey:@"longitude"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.altitude] forKey:@"altitude"];
-    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.horizontalAccuracy] forKey:@"horizontalAccuracy"];
+    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.horizontalAccuracy] forKey:@"accuracy"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.verticalAccuracy] forKey:@"verticalAccuracy"];
-    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.verticalAccuracy] forKey:@"course"];
+    [locationMap setValue:[NSNumber numberWithDouble:currentLocation.course] forKey:@"bearing"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.speed] forKey:@"speed"];
                                  
     success(@[locationMap]);
