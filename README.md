@@ -6,14 +6,15 @@ React native module for hypertrack-android and hypertrack-ios SDKs. Methods in t
 ### To build live location features within your own React Native app
 Follow [this step-by-step onboarding guide](https://dashboard.hypertrack.com/onboarding/sdk-reactnative) that will walk you through the sdk integration within your own app in a matter of few minutes.
 
-## Getting started - Android
-1. In your project directory, install and link the module package from npm.
-    ```bash
-    $ npm install react-native-hypertrack --save
-    $ react-native link react-native-hypertrack
-    ```
+In your project directory, install and link the module package from npm.
 
-2. To use the HyperTrack Android SDKs, the following urls need to be added to your `android/build.gradle` file. This will configure the repository urls for the SDKs.
+```bash
+$ npm install react-native-hypertrack --save
+$ react-native link react-native-hypertrack
+```
+
+## Getting started - Android
+1. To use the HyperTrack Android SDKs, the following urls need to be added to your `android/build.gradle` file. This will configure the repository urls for the SDKs.
 
     ```groovy
     allprojects {
@@ -24,7 +25,7 @@ Follow [this step-by-step onboarding guide](https://dashboard.hypertrack.com/onb
     }
     ```
     
-3. Import inside Javascript
+2. Import inside Javascript
     ```js
     import RNHyperTrack from 'react-nativee-hypertrack';
     ```
