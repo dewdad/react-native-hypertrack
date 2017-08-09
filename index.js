@@ -3,6 +3,11 @@ import { NativeModules } from 'react-native';
 const { RNHyperTrack } = NativeModules;
 
 module.exports = {
+
+    /**
+     Initialization methods
+    */
+
     // Method to intialize the SDK with publishable key
     initialize(token) {
         RNHyperTrack.initialize(token);
@@ -12,6 +17,10 @@ module.exports = {
     getPublishableKey(callback) {
         RNHyperTrack.getPublishableKey(callback);
     },
+
+    /**
+     Setup methods
+    */
 
     // get or create a new user
     getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback) {
@@ -23,10 +32,36 @@ module.exports = {
         RNHyperTrack.setUserId(userId);
     },
 
+    /**
+     Util methods
+    */
+
     // get current user id
     getUserId(callback) {
         RNHyperTrack.getUserId(callback);
     },
+
+    // get tracking status
+    isTracking(callback) {
+        RNHyperTrack.isTracking(callback);
+    },
+
+    // Method to get eta to an expected location
+    // Vehicle type can be "car", "bicycle", "van", "walking", "three-wheeler", "motorcycle"
+    getETA(latitude, longitude, vehicleType, successCallback, errorCallback) {
+        RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
+    },
+
+    // Method to get user's current location
+    // Returns currentLocation as a Json, and error if location is 
+    // disabled or permission denied
+    getCurrentLocation(successCallback, errorCallback) {
+        RNHyperTrack.getCurrentLocation(successCallback, errorCallback)
+    },
+
+    /**
+     Basic integration methods
+    */
 
     // start tracking
     startTracking(successCallback, errorCallback) {
@@ -38,10 +73,9 @@ module.exports = {
         RNHyperTrack.stopTracking();
     },
 
-    // get tracking status
-    isTracking(callback) {
-        RNHyperTrack.isTracking(callback);
-    },
+    /**
+     Action methods
+    */
 
     // create and assign action
     createAndAssignAction(actionParams, successCallback, errorCallback) {
@@ -68,9 +102,43 @@ module.exports = {
         RNHyperTrack.completeAction(actionId);
     },
 
-    // Method to get eta to an expected location
-    // Vehicle type can be "car", "bicycle", "van"
-    getETA(latitude, longitude, vehicleType, successCallback, errorCallback) {
-        RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
+    /**
+     Location Authorization (or Permission) methods
+    */
+
+    locationAuthorizationStatus(callback) {
+        RNHyperTrack.locationAuthorizationStatus(callback);
+    },
+
+    requestLocationWhenInUseAuthorization(rationaleTitle, rationaleMessage) {
+        RNHyperTrack.requestWhenInUseAuthorization(rationaleTitle, rationaleMessage);
+    },
+
+    requestLocationAuthorization(rationaleTitle, rationaleMessage) {
+        RNHyperTrack.requestLocationAuthorization(rationaleTitle, rationaleMessage);
+    },
+
+    /**
+     Location services methods
+    */
+
+    locationServicesEnabled(callback) {
+        RNHyperTrack.locationServicesEnabled(callback);
+    },
+
+    requestLocationServices() {
+        RNHyperTrack.requestLocationServices();
+    },
+
+    /**
+     Motion Authorization methods (** For iOS only **)
+    */
+
+    canAskMotionPermissions(callback) {
+        RNHyperTrack.canAskMotionPermissions(callback);
+    },
+
+    requstMotionAuthorization() {
+        RNHyperTrack.requstMotionAuthorization();
     }
 }
