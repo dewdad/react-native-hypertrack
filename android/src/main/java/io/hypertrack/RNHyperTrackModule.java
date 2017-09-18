@@ -270,6 +270,16 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         HyperTrack.stopTracking();
     }
 
+    @ReactMethod
+    public void startMockTracking() {
+        HyperTrack.startMockTracking();
+    }
+
+    @ReactMethod
+    public void stopMockTracking() {
+        HyperTrack.stopMockTracking();
+    }
+
     /**
     * Action methods
     **/
