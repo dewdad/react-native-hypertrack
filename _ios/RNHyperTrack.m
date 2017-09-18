@@ -240,6 +240,18 @@ RCT_EXPORT_METHOD(stopTracking)
 }
 
 
+RCT_EXPORT_METHOD(startMockTracking)
+{
+  [HyperTrack startMockTracking];
+}
+
+
+RCT_EXPORT_METHOD(stopMockTracking)
+{
+  [HyperTrack stopMockTracking];
+}
+
+
 /**
  Action methods
 */

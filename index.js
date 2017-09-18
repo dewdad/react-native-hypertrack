@@ -68,9 +68,19 @@ module.exports = {
         RNHyperTrack.startTracking(successCallback, errorCallback);
     },
 
-    // start tracking
+    // stop tracking
     stopTracking() {
         RNHyperTrack.stopTracking();
+    },
+
+    // start mock tracking
+    startMockTracking() {
+        RNHyperTrack.startMockTracking();
+    },
+
+    // stop mock tracking
+    stopMockTracking() {
+        RNHyperTrack.stopMockTracking();
     },
 
     /**
