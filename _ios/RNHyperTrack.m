@@ -52,9 +52,9 @@ RCT_EXPORT_METHOD(initialize :(NSString *)token) {
 }
  
 
-RCT_EXPORT_METHOD(getPublishableKey :(RCTResponseSenderBlock) callback)
+RCT_EXPORT_METHOD(getPublishableKey :(RCTResponseSenderBlock) callback, getPublishableKeyWithResolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  callback(@[[HyperTrack getPublishableKey]]);
+  resolve(@[[HyperTrack getPublishableKey]]);
 }  
 
 
