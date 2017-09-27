@@ -119,7 +119,7 @@ module.exports = {
     },
 
     requestLocationAuthorization(rationaleTitle, rationaleMessage) {
-        return RNHyperTrack.requestLocationAuthorization(rationaleTitle, rationaleMessage);
+        RNHyperTrack.requestLocationAuthorization(rationaleTitle, rationaleMessage);
     },
 
     /**
