@@ -21,6 +21,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.Promise;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -111,9 +112,10 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void getPublishableKey(final Callback callback) {
+    public void getPublishableKey(final Callback callback, final Promise promise) {
         Context context = getReactApplicationContext();
-        callback.invoke(HyperTrack.getPublishableKey(context));
+        // callback.invoke(HyperTrack.getPublishableKey(context));
+        promise.resolve(HyperTrack.getPublishableKey(context));
     }
 
     /**
@@ -121,20 +123,22 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Callback successCallback, final Callback errorCallback) {
+    public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Callback successCallback, final Callback errorCallback, final Promise promise) {
         HyperTrack.getOrCreateUser(userName, phoneNumber, lookupId, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
                 User user = (User) response.getResponseObject();
                 String serializedUser = new GsonBuilder().create().toJson(user);
-                successCallback.invoke(serializedUser);
+                // successCallback.invoke(serializedUser);
+                promise.resolve(serializedUser);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
             }
         });
     }
@@ -149,8 +153,9 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
    
     @ReactMethod
-    public void locationAuthorizationStatus(final Callback callback) {
-        callback.invoke(HyperTrack.checkLocationPermission(reactContext));
+    public void locationAuthorizationStatus(final Callback callback, final Promise promise) {
+        // callback.invoke(HyperTrack.checkLocationPermission(reactContext));
+        promise.resolve(HyperTrack.checkLocationPermission(reactContext));
     }
 
     @ReactMethod
@@ -168,8 +173,9 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void locationServicesEnabled(final Callback callback) {
-        callback.invoke(HyperTrack.checkLocationServices(reactContext));
+    public void locationServicesEnabled(final Callback callback, final Promise promise) {
+        // callback.invoke(HyperTrack.checkLocationServices(reactContext));
+        promise.resolve(HyperTrack.checkLocationServices(reactContext));
     }
 
     @ReactMethod
@@ -182,18 +188,20 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void getUserId(final Callback callback) {
-        callback.invoke(HyperTrack.getUserId());
+    public void getUserId(final Callback callback, Promise promise) {
+        // callback.invoke(HyperTrack.getUserId());
+        promise.resolve(HyperTrack.getUserId());
     }
 
     @ReactMethod
-    public void isTracking(final Callback callback) {
-        callback.invoke(HyperTrack.isTracking());
+    public void isTracking(final Callback callback, Promise promise) {
+        // callback.invoke(HyperTrack.isTracking());
+        promise.resolve(HyperTrack.isTracking());
     }
 
     @ReactMethod
     public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, 
-            final Callback successCallback, final Callback errorCallback) {
+            final Callback successCallback, final Callback errorCallback, final Promise promise) {
         LatLng expectedLocation = new LatLng(expectedPlaceLat, expectedPlaceLng);
         VehicleType vType = VehicleType.valueOf(vehicleType.toUpperCase());
 
@@ -202,20 +210,22 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Handle getETA API success here
                 Double eta = (Double) response.getResponseObject();
-                successCallback.invoke(eta);
+                // successCallback.invoke(eta);
+                promise.resolve(eta);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 // Handle getETA API error here
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
             }
         });
     }
 
     @ReactMethod
-    public void getCurrentLocation(final Callback successCallback, final Callback errorCallback) {
+    public void getCurrentLocation(final Callback successCallback, final Callback errorCallback, final Promise promise) {
         HyperTrack.getCurrentLocation(new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
@@ -231,14 +241,16 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
                 locationMap.putDouble("bearing", (double) location.getBearing());
                 locationMap.putDouble("altitude", location.getAltitude());
 
-                successCallback.invoke(locationMap);
+                // successCallback.invoke(locationMap);
+                promise.resolve(locationMap);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 // Handle getETA API error here
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
             }
         });
     }
@@ -248,19 +260,21 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void startTracking(final Callback successCallback, final Callback errorCallback) {
+    public void startTracking(final Callback successCallback, final Callback errorCallback, final Promise promise) {
         HyperTrack.startTracking(new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
                 String userId = (String) response.getResponseObject();
-                successCallback.invoke(userId);
+                // successCallback.invoke(userId);
+                promise.resolve(userId);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
             }
         });
     }
@@ -271,8 +285,20 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void startMockTracking() {
-        HyperTrack.startMockTracking();
+    public void startMockTracking(final Promise promise) {
+        HyperTrack.startMockTracking(
+            new HyperTrackCallback() {
+                @Override
+                public void onSuccess(@NonNull SuccessResponse response) {
+                    
+                }
+
+                @Override
+                public void onError(@NonNull ErrorResponse errorResponse) {
+
+                }
+            }
+        );
     }
 
     @ReactMethod
@@ -285,7 +311,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void createAndAssignAction(ReadableMap params, final Callback successCallback, final Callback errorCallback) {
+    public void createAndAssignAction(ReadableMap params, final Callback successCallback, final Callback errorCallback, final Promise promise) {
         ActionParamsBuilder actionParamsBuilder = new ActionParamsBuilder();
 
         if (params.hasKey("expected_place_id")) {
@@ -310,19 +336,21 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
                 // Return Action object in successCallback
                 Action action = (Action) response.getResponseObject();
                 String serializedAction = new GsonBuilder().create().toJson(action);
-                successCallback.invoke(serializedAction);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
             }
         });
     }
 
     @ReactMethod
-    public void assignActions(final ReadableArray actionIds, final Callback successCallback, final Callback errorCallback) {
+    public void assignActions(final ReadableArray actionIds, final Callback successCallback, final Callback errorCallback, final Promise promise) {
         List<String> actionIdsStrings = new ArrayList<String>();
 
         for (int i = 0; i < actionIds.size(); i++) {
@@ -335,34 +363,38 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
                 // Return User object in successCallback
                 User user = (User) response.getResponseObject();
                 String serializedUser = new GsonBuilder().create().toJson(user);
-                successCallback.invoke(serializedUser);
+                // successCallback.invoke(serializedUser);
+                promise.resolve(serializedUser);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 // Handle getETA API error here
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
             }
         });
     }
 
     @ReactMethod
-    public void getAction(String actionId, final Callback successCallback, final Callback errorCallback) {
+    public void getAction(String actionId, final Callback successCallback, final Callback errorCallback, final Promise promise) {
         HyperTrack.getAction(actionId, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Handle getAction response here
                 Action actionResponse = (Action) response.getResponseObject();
                 String serializedAction = new GsonBuilder().create().toJson(actionResponse);
-                successCallback.invoke(serializedAction);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 // Handle getAction error here
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                errorCallback.invoke(serializedError);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
             }
         });
     }

@@ -15,7 +15,7 @@ module.exports = {
 
     // get active publishable key
     getPublishableKey(callback) {
-        RNHyperTrack.getPublishableKey(callback);
+        return RNHyperTrack.getPublishableKey(callback);
     },
 
     /**
@@ -24,7 +24,7 @@ module.exports = {
 
     // get or create a new user
     getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback) {
-        RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback);
+        return RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback);
     },
 
     // set a user with id
@@ -38,25 +38,25 @@ module.exports = {
 
     // get current user id
     getUserId(callback) {
-        RNHyperTrack.getUserId(callback);
+        return RNHyperTrack.getUserId(callback);
     },
 
     // get tracking status
     isTracking(callback) {
-        RNHyperTrack.isTracking(callback);
+        return RNHyperTrack.isTracking(callback);
     },
 
     // Method to get eta to an expected location
     // Vehicle type can be "car", "bicycle", "van", "walking", "three-wheeler", "motorcycle"
     getETA(latitude, longitude, vehicleType, successCallback, errorCallback) {
-        RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
+        return RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
     },
 
     // Method to get user's current location
     // Returns currentLocation as a Json, and error if location is 
     // disabled or permission denied
     getCurrentLocation(successCallback, errorCallback) {
-        RNHyperTrack.getCurrentLocation(successCallback, errorCallback)
+        return RNHyperTrack.getCurrentLocation(successCallback, errorCallback)
     },
 
     /**
@@ -65,7 +65,7 @@ module.exports = {
 
     // start tracking
     startTracking(successCallback, errorCallback) {
-        RNHyperTrack.startTracking(successCallback, errorCallback);
+        return RNHyperTrack.startTracking(successCallback, errorCallback);
     },
 
     // stop tracking
@@ -94,17 +94,17 @@ module.exports = {
         // expected_place_id: uuid of expected place
         // lookup_id: string object for action lookup id
         // type: string object, that can be one of "visit", "pickup", "delivery"
-        RNHyperTrack.createAndAssignAction(actionParams, successCallback, errorCallback);
+        return RNHyperTrack.createAndAssignAction(actionParams, successCallback, errorCallback);
     },
 
     // Method to assign action
     assignActions(actionIds, successCallback, errorCallback) {
-        RNHyperTrack.assignActions(actionIds, successCallback, errorCallback)
+        return RNHyperTrack.assignActions(actionIds, successCallback, errorCallback)
     },
 
     // get details of an action
     getAction(actionId, successCallback, errorCallback) {
-        RNHyperTrack.getAction(actionId, successCallback, errorCallback);
+        return RNHyperTrack.getAction(actionId, successCallback, errorCallback);
     },
 
     // Method to complete an action
@@ -117,7 +117,7 @@ module.exports = {
     */
 
     locationAuthorizationStatus(callback) {
-        RNHyperTrack.locationAuthorizationStatus(callback);
+        return RNHyperTrack.locationAuthorizationStatus(callback);
     },
 
     requestLocationWhenInUseAuthorization(rationaleTitle, rationaleMessage) {
@@ -133,7 +133,7 @@ module.exports = {
     */
 
     locationServicesEnabled(callback) {
-        RNHyperTrack.locationServicesEnabled(callback);
+        return RNHyperTrack.locationServicesEnabled(callback);
     },
 
     requestLocationServices() {

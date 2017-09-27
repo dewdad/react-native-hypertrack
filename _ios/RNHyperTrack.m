@@ -7,21 +7,21 @@
 @import HyperTrack;
 
 @implementation RNHyperTrack
-  
-  
+
+
 RCT_EXPORT_MODULE();
-  
+
 /**
  HyperTrackEvent methods
-*/
-  
+ */
+
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
 }
-  
+
 
 - (NSArray<NSString *> *)supportedEvents {
-    return @[@"location.changed"];
+  return @[@"location.changed"];
 }
 
 
@@ -32,7 +32,7 @@ RCT_EXPORT_MODULE();
     [self sendEventWithName:@"location.changed" body:@{@"geojson": [event.location.location toJson]}];
   }
 }
-  
+
 
 - (void) didFailWithError:(HyperTrackError *)error {
   // HyperTrack delegate method
@@ -41,34 +41,43 @@ RCT_EXPORT_MODULE();
 
 /**
  Initialization methods
-*/
-  
+ */
+
 
 RCT_EXPORT_METHOD(initialize :(NSString *)token) {
   RCTLogInfo(@"Initializing HyperTrack with token: %@", token);
   [HyperTrack initialize:token];
   [HyperTrack setDelegate:self];
 }
- 
 
-RCT_EXPORT_METHOD(getPublishableKey :(RCTResponseSenderBlock) callback)
+
+RCT_EXPORT_METHOD(getPublishableKey :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  callback(@[[HyperTrack getPublishableKey]]);
-}  
+  resolve(@[[HyperTrack getPublishableKey]]);
+}
 
 
 /**
  Setup methods
-*/
+ */
+-(NSError *)getErrorFromHyperTrackError:(HyperTrackError *)hyperTrackError{
+  NSDictionary * userInfo = @{@"description":hyperTrackError.errorMessage};
+  
+  NSError * nsError = [NSError errorWithDomain:@"HyperTrackError"
+                                          code:hyperTrackError.errorCode
+                                      userInfo:userInfo];
 
+  return  nsError;
+}
 
-RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSString *)lookupId :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure) {
+RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSString *)lookupId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   [HyperTrack getOrCreateUser:name _phone:phone :lookupId completionHandler:^(HyperTrackUser * _Nullable user, HyperTrackError * _Nullable error) {
     if (error) {
-      failure(@[error]);
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
     } else {
       if (user) {
-        success(@[[user toJson]]);
+        resolve(@[[user toJson]]);
       }
     }
   }];
@@ -83,28 +92,28 @@ RCT_EXPORT_METHOD(setUserId :(NSString *)userId)
 
 /**
  Location Authorization methods
-*/
+ */
 
 
-RCT_EXPORT_METHOD(locationAuthorizationStatus :(RCTResponseSenderBlock) callback)
+RCT_EXPORT_METHOD(locationAuthorizationStatus :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   CLAuthorizationStatus locationAuthorizationStatus = [HyperTrack locationAuthorizationStatus];
   switch (locationAuthorizationStatus) {
     default:
     case kCLAuthorizationStatusNotDetermined:
-      callback(@[@"notDetermined"]);
+      resolve(@[@"notDetermined"]);
       break;
     case kCLAuthorizationStatusRestricted:
-      callback(@[@"restricted"]);
+      resolve(@[@"restricted"]);
       break;
     case kCLAuthorizationStatusDenied:
-      callback(@[@"denied"]);
+      resolve(@[@"denied"]);
       break;
     case kCLAuthorizationStatusAuthorizedAlways:
-      callback(@[@"authorizedAlways"]);
+      resolve(@[@"authorizedAlways"]);
       break;
     case kCLAuthorizationStatusAuthorizedWhenInUse:
-      callback(@[@"authorizedWhenInUse"]);
+      resolve(@[@"authorizedWhenInUse"]);
       break;
   }
 }
@@ -124,12 +133,12 @@ RCT_EXPORT_METHOD(requestLocationAuthorization:(NSString *)rationaleTitle :(NSSt
 
 /**
  Location Services methods
-*/
+ */
 
 
-RCT_EXPORT_METHOD(locationServicesEnabled :(RCTResponseSenderBlock) callback)
+RCT_EXPORT_METHOD(locationServicesEnabled :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  callback(@[[NSNumber numberWithBool:[HyperTrack locationServicesEnabled]]]);
+  resolve(@[[NSNumber numberWithBool:[HyperTrack locationServicesEnabled]]]);
 }
 
 
@@ -141,12 +150,12 @@ RCT_EXPORT_METHOD(requestLocationServices)
 
 /**
  Motion Authorization methods
-*/
+ */
 
 
-RCT_EXPORT_METHOD(canAskMotionPermissions :(RCTResponseSenderBlock) callback)
+RCT_EXPORT_METHOD(canAskMotionPermissions :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  callback(@[[NSNumber numberWithBool:[HyperTrack canAskMotionPermissions]]]);
+  resolve(@[[NSNumber numberWithBool:[HyperTrack canAskMotionPermissions]]]);
 }
 
 
@@ -158,21 +167,21 @@ RCT_EXPORT_METHOD(requestMotionAuthorization)
 
 /**
  Util methods
-*/
+ */
 
-RCT_EXPORT_METHOD(isTracking :(RCTResponseSenderBlock) callback)
+RCT_EXPORT_METHOD(isTracking :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  callback(@[[NSNumber numberWithBool:[HyperTrack isTracking]]]);
+  resolve(@[[NSNumber numberWithBool:[HyperTrack isTracking]]]);
 }
 
 
-RCT_EXPORT_METHOD(getUserId :(RCTResponseSenderBlock) callback)
+RCT_EXPORT_METHOD(getUserId :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  callback(@[[HyperTrack getUserId]]);
+  resolve(@[[HyperTrack getUserId]]);
 }
 
 
-RCT_EXPORT_METHOD(getETA :(nonnull NSNumber *)latitude :(nonnull NSNumber *)longitude :(NSString *)vehicle :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+RCT_EXPORT_METHOD(getETA :(nonnull NSNumber *)latitude :(nonnull NSNumber *)longitude :(NSString *)vehicle resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   CLLocationCoordinate2D coord;
   coord.longitude = (CLLocationDegrees)[longitude doubleValue];
@@ -183,24 +192,26 @@ RCT_EXPORT_METHOD(getETA :(nonnull NSNumber *)latitude :(nonnull NSNumber *)long
                                completionHandler:^(NSNumber * _Nullable eta,
                                                    HyperTrackError * _Nullable error) {
                                  if (error) {
-                                   failure(@[error]);
+                                   NSError * nsError = [self getErrorFromHyperTrackError:error];
+                                   reject(@"Error", @"", nsError);
                                    return;
                                  }
                                  
-                                 success(@[eta]);
+                                 resolve(@[eta]);
                                }];
 }
 
 
-RCT_EXPORT_METHOD(getCurrentLocation :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+RCT_EXPORT_METHOD(getCurrentLocation :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   [HyperTrack getCurrentLocationWithCompletionHandler:^(CLLocation * _Nullable currentLocation,
-                                                   HyperTrackError * _Nullable error) {
+                                                        HyperTrackError * _Nullable error) {
     if (error) {
-      failure(@[[error toJson]]);
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
       return;
     }
-
+    
     NSMutableDictionary *locationMap = [[NSMutableDictionary alloc] init];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.coordinate.latitude] forKey:@"latitude"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.coordinate.longitude] forKey:@"longitude"];
@@ -209,25 +220,26 @@ RCT_EXPORT_METHOD(getCurrentLocation :(RCTResponseSenderBlock) success :(RCTResp
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.verticalAccuracy] forKey:@"verticalAccuracy"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.course] forKey:@"bearing"];
     [locationMap setValue:[NSNumber numberWithDouble:currentLocation.speed] forKey:@"speed"];
-                                 
-    success(@[locationMap]);
+    
+    resolve(@[locationMap]);
   }];
 }
 
 
 /**
  Basic integration methods
-*/
+ */
 
 
-RCT_EXPORT_METHOD(startTracking :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+RCT_EXPORT_METHOD(startTracking :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   [HyperTrack startTrackingWithCompletionHandler:^(HyperTrackError * _Nullable error) {
     if (error) {
-      failure(@[error]);
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
     } else {
       // TODO: response object
-      success(@[]);
+      resolve(@[]);
     }
   }];
 }
@@ -253,10 +265,10 @@ RCT_EXPORT_METHOD(stopMockTracking)
 
 /**
  Action methods
-*/
+ */
 
 
-RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   HyperTrackActionParams * htActionParams = [[HyperTrackActionParams alloc] init];
   
@@ -281,50 +293,53 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params :(RCTResponseSe
                                       HyperTrackError * _Nullable error) {
                                      if (error) {
                                        // Handle createAndAssignAction API error here
-                                       failure(@[error]);
+                                       NSError * nsError = [self getErrorFromHyperTrackError:error];
+                                       reject(@"Error", @"", nsError);
                                        return;
                                      }
                                      
                                      if (action) {
                                        // Handle createAndAssignAction API success here
-                                       success(@[[action toJson]]);
+                                       resolve(@[[action toJson]]);
                                      }
                                    }];
   
 }
 
 
-RCT_EXPORT_METHOD(assignActions :(NSArray *)actionIds :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+RCT_EXPORT_METHOD(assignActions :(NSArray *)actionIds resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   [HyperTrack assignActionsWithActionIds:actionIds :^(HyperTrackUser * _Nullable user, HyperTrackError * _Nullable error) {
     
     if (error) {
-      failure(@[error]);
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
       return;
     }
     
     if (user) {
-      success(@[[user toJson]]);
+      resolve(@[[user toJson]]);
     }
     
   }];
 }
 
 
-RCT_EXPORT_METHOD(getAction :(NSString *)actionId :(RCTResponseSenderBlock) success :(RCTResponseSenderBlock) failure)
+RCT_EXPORT_METHOD(getAction :(NSString *)actionId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   [HyperTrack getAction:actionId
       completionHandler:^(HyperTrackAction * _Nullable action,
                           HyperTrackError * _Nullable error) {
         if (error) {
           // Handle error and call failure callback
-          failure(@[error]);
+          NSError * nsError = [self getErrorFromHyperTrackError:error];
+          reject(@"Error", @"", nsError);
           return;
         }
         
         if (action) {
           // Send action to success callback
-          success(@[[action toJson]]);
+          resolve(@[[action toJson]]);
         }
       }];
 }
