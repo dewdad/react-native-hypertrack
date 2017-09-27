@@ -164,8 +164,9 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void requestLocationAuthorization(String rationaleTitle, String rationaleMessage) {
+    public void requestLocationAuthorization(String rationaleTitle, String rationaleMessage, final Promise promise) {
         HyperTrack.requestPermissions(getCurrentActivity(), rationaleTitle, rationaleMessage);
+        promise.resolve(true);
     }
 
     /**
