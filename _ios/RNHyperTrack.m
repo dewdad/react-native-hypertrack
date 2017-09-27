@@ -125,11 +125,9 @@ RCT_EXPORT_METHOD(requestWhenInUseAuthorization:(NSString *)rationaleTitle :(NSS
 }
 
 
-RCT_EXPORT_METHOD(requestLocationAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(requestLocationAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage)
 {
-  [HyperTrack requestAlwaysAuthorizationWithCompletionHandler:^(BOOL didAuthorized) {
-    resolve(@(didAuthorized));
-  }];
+  [HyperTrack requestAlwaysAuthorization];
 }
 
 
