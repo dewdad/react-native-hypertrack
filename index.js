@@ -7,7 +7,6 @@ module.exports = {
     /**
      Initialization methods
     */
-
     // Method to intialize the SDK with publishable key
     initialize(token) {
         RNHyperTrack.initialize(token);
@@ -21,7 +20,6 @@ module.exports = {
     /**
      Setup methods
     */
-
     // get or create a new user
     getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback) {
         return RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback);
@@ -35,7 +33,6 @@ module.exports = {
     /**
      Util methods
     */
-
     // get current user id
     getUserId(callback) {
         return RNHyperTrack.getUserId(callback);
@@ -62,7 +59,6 @@ module.exports = {
     /**
      Basic integration methods
     */
-
     // start tracking
     startTracking(successCallback, errorCallback) {
         return RNHyperTrack.startTracking(successCallback, errorCallback);
@@ -86,7 +82,6 @@ module.exports = {
     /**
      Action methods
     */
-
     // create and assign action
     createAndAssignAction(actionParams, successCallback, errorCallback) {
         // actionParams is a dictionary with following keys
@@ -115,7 +110,6 @@ module.exports = {
     /**
      Location Authorization (or Permission) methods
     */
-
     locationAuthorizationStatus(callback) {
         return RNHyperTrack.locationAuthorizationStatus(callback);
     },
@@ -131,7 +125,6 @@ module.exports = {
     /**
      Location services methods
     */
-
     locationServicesEnabled(callback) {
         return RNHyperTrack.locationServicesEnabled(callback);
     },
@@ -143,12 +136,11 @@ module.exports = {
     /**
      Motion Authorization methods (** For iOS only **)
     */
-
     canAskMotionPermissions(callback) {
         RNHyperTrack.canAskMotionPermissions(callback);
     },
 
-    requstMotionAuthorization() {
-        RNHyperTrack.requstMotionAuthorization();
+    requestMotionAuthorization() {
+        RNHyperTrack.requestMotionAuthorization();
     }
 }

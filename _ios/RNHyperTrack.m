@@ -47,7 +47,6 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(initialize :(NSString *)token) {
   RCTLogInfo(@"Initializing HyperTrack with token: %@", token);
   [HyperTrack initialize:token];
-  [HyperTrack requestAlwaysAuthorization];
   [HyperTrack setDelegate:self];
 }
 
