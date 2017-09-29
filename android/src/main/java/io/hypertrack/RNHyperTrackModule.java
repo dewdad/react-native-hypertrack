@@ -112,7 +112,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void getPublishableKey(final Callback callback, final Promise promise) {
+    public void getPublishableKey(final Promise promise) {
         Context context = getReactApplicationContext();
         // callback.invoke(HyperTrack.getPublishableKey(context));
         promise.resolve(HyperTrack.getPublishableKey(context));
@@ -123,7 +123,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Callback successCallback, final Callback errorCallback, final Promise promise) {
+    public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Promise promise) {
         HyperTrack.getOrCreateUser(userName, phoneNumber, lookupId, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
@@ -153,7 +153,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
    
     @ReactMethod
-    public void locationAuthorizationStatus(final Callback callback, final Promise promise) {
+    public void locationAuthorizationStatus(final Promise promise) {
         // callback.invoke(HyperTrack.checkLocationPermission(reactContext));
         promise.resolve(HyperTrack.checkLocationPermission(reactContext));
     }
@@ -173,7 +173,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void locationServicesEnabled(final Callback callback, final Promise promise) {
+    public void locationServicesEnabled(final Promise promise) {
         // callback.invoke(HyperTrack.checkLocationServices(reactContext));
         promise.resolve(HyperTrack.checkLocationServices(reactContext));
     }
@@ -188,20 +188,19 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void getUserId(final Callback callback, Promise promise) {
+    public void getUserId(Promise promise) {
         // callback.invoke(HyperTrack.getUserId());
         promise.resolve(HyperTrack.getUserId());
     }
 
     @ReactMethod
-    public void isTracking(final Callback callback, Promise promise) {
+    public void isTracking(Promise promise) {
         // callback.invoke(HyperTrack.isTracking());
         promise.resolve(HyperTrack.isTracking());
     }
 
     @ReactMethod
-    public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, 
-            final Callback successCallback, final Callback errorCallback, final Promise promise) {
+    public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, final Promise promise) {
         LatLng expectedLocation = new LatLng(expectedPlaceLat, expectedPlaceLng);
         VehicleType vType = VehicleType.valueOf(vehicleType.toUpperCase());
 
@@ -225,7 +224,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void getCurrentLocation(final Callback successCallback, final Callback errorCallback, final Promise promise) {
+    public void getCurrentLocation(final Promise promise) {
         HyperTrack.getCurrentLocation(new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
@@ -260,7 +259,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void startTracking(final Callback successCallback, final Callback errorCallback, final Promise promise) {
+    public void startTracking(final Promise promise) {
         HyperTrack.startTracking(new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
@@ -311,7 +310,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     **/
 
     @ReactMethod
-    public void createAndAssignAction(ReadableMap params, final Callback successCallback, final Callback errorCallback, final Promise promise) {
+    public void createAndAssignAction(ReadableMap params, final Promise promise) {
         ActionParamsBuilder actionParamsBuilder = new ActionParamsBuilder();
 
         if (params.hasKey("expected_place_id")) {
@@ -350,7 +349,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void assignActions(final ReadableArray actionIds, final Callback successCallback, final Callback errorCallback, final Promise promise) {
+    public void assignActions(final ReadableArray actionIds, final Promise promise) {
         List<String> actionIdsStrings = new ArrayList<String>();
 
         for (int i = 0; i < actionIds.size(); i++) {
@@ -378,7 +377,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void getAction(String actionId, final Callback successCallback, final Callback errorCallback, final Promise promise) {
+    public void getAction(String actionId, final Promise promise) {
         HyperTrack.getAction(actionId, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {

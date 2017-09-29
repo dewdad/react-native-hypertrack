@@ -13,16 +13,16 @@ module.exports = {
     },
 
     // get active publishable key
-    getPublishableKey(callback) {
-        return RNHyperTrack.getPublishableKey(callback);
+    getPublishableKey() {
+        return RNHyperTrack.getPublishableKey();
     },
 
     /**
      Setup methods
     */
     // get or create a new user
-    getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback) {
-        return RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId, successCallback, errorCallback);
+    getOrCreateUser(name, phoneNumber, lookupId) {
+        return RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId);
     },
 
     // set a user with id
@@ -34,34 +34,34 @@ module.exports = {
      Util methods
     */
     // get current user id
-    getUserId(callback) {
-        return RNHyperTrack.getUserId(callback);
+    getUserId() {
+        return RNHyperTrack.getUserId();
     },
 
     // get tracking status
-    isTracking(callback) {
-        return RNHyperTrack.isTracking(callback);
+    isTracking() {
+        return RNHyperTrack.isTracking();
     },
 
     // Method to get eta to an expected location
     // Vehicle type can be "car", "bicycle", "van", "walking", "three-wheeler", "motorcycle"
-    getETA(latitude, longitude, vehicleType, successCallback, errorCallback) {
-        return RNHyperTrack.getETA(latitude, longitude, vehicleType, successCallback, errorCallback)
+    getETA(latitude, longitude, vehicleType) {
+        return RNHyperTrack.getETA(latitude, longitude, vehicleType)
     },
 
     // Method to get user's current location
     // Returns currentLocation as a Json, and error if location is 
     // disabled or permission denied
-    getCurrentLocation(successCallback, errorCallback) {
-        return RNHyperTrack.getCurrentLocation(successCallback, errorCallback)
+    getCurrentLocation() {
+        return RNHyperTrack.getCurrentLocation()
     },
 
     /**
      Basic integration methods
     */
     // start tracking
-    startTracking(successCallback, errorCallback) {
-        return RNHyperTrack.startTracking(successCallback, errorCallback);
+    startTracking() {
+        return RNHyperTrack.startTracking();
     },
 
     // stop tracking
@@ -83,23 +83,23 @@ module.exports = {
      Action methods
     */
     // create and assign action
-    createAndAssignAction(actionParams, successCallback, errorCallback) {
+    createAndAssignAction(actionParams) {
         // actionParams is a dictionary with following keys
         // expected_at: ISO datetime string
         // expected_place_id: uuid of expected place
         // lookup_id: string object for action lookup id
         // type: string object, that can be one of "visit", "pickup", "delivery"
-        return RNHyperTrack.createAndAssignAction(actionParams, successCallback, errorCallback);
+        return RNHyperTrack.createAndAssignAction(actionParams);
     },
 
     // Method to assign action
-    assignActions(actionIds, successCallback, errorCallback) {
-        return RNHyperTrack.assignActions(actionIds, successCallback, errorCallback)
+    assignActions(actionIds) {
+        return RNHyperTrack.assignActions(actionIds)
     },
 
     // get details of an action
-    getAction(actionId, successCallback, errorCallback) {
-        return RNHyperTrack.getAction(actionId, successCallback, errorCallback);
+    getAction(actionId) {
+        return RNHyperTrack.getAction(actionId);
     },
 
     // Method to complete an action
@@ -110,8 +110,8 @@ module.exports = {
     /**
      Location Authorization (or Permission) methods
     */
-    locationAuthorizationStatus(callback) {
-        return RNHyperTrack.locationAuthorizationStatus(callback);
+    locationAuthorizationStatus() {
+        return RNHyperTrack.locationAuthorizationStatus();
     },
 
     requestLocationWhenInUseAuthorization(rationaleTitle, rationaleMessage) {
@@ -125,8 +125,8 @@ module.exports = {
     /**
      Location services methods
     */
-    locationServicesEnabled(callback) {
-        return RNHyperTrack.locationServicesEnabled(callback);
+    locationServicesEnabled() {
+        return RNHyperTrack.locationServicesEnabled();
     },
 
     requestLocationServices() {
@@ -136,8 +136,8 @@ module.exports = {
     /**
      Motion Authorization methods (** For iOS only **)
     */
-    canAskMotionPermissions(callback) {
-        RNHyperTrack.canAskMotionPermissions(callback);
+    canAskMotionPermissions() {
+        RNHyperTrack.canAskMotionPermissions();
     },
 
     requestMotionAuthorization() {
