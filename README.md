@@ -90,9 +90,9 @@ export default class MyApp extends Component {
 
 ```javascript
 // Call this method to check location authorization status.
-RNHyperTrack.locationAuthorizationStatus((callback) => {
-  // Handle locationAuthorizationStatus API callback here
-  console.log('locationAuthorizationStatus: ', callback);
+RNHyperTrack.locationAuthorizationStatus().then((result) => {
+  // Handle locationAuthorizationStatus API result here
+  console.log('locationAuthorizationStatus: ', result);
 });
 
 // Call this method to request Location Authorization for Android & iOS (Always Authorization).
@@ -100,16 +100,16 @@ RNHyperTrack.locationAuthorizationStatus((callback) => {
 RNHyperTrack.requestLocationAuthorization(title, message);
 
 // Call this method to check location services are enabled or not.
-RNHyperTrack.locationServicesEnabled((callback) => {
-  // Handle locationServicesEnabled API callback here
-  console.log('locationServicesEnabled: ', callback);
+RNHyperTrack.locationServicesEnabled().then((result) => {
+  // Handle locationServicesEnabled API result here
+  console.log('locationServicesEnabled: ', result);
 });
 
 // Call this method to check if Motion Activity API is available on the device
 // NOTE: Motion Authorization is required only for iOS. This API will return an error in Android.
-RNHyperTrack.canAskMotionPermissions((callback) => {
-  // Handle canAskMotionPermissions API callback here
-  console.log('canAskMotionPermissions: ', callback);
+RNHyperTrack.canAskMotionPermissions().then((result) => {
+  // Handle canAskMotionPermissions API result here
+  console.log('canAskMotionPermissions: ', result);
 });
 
 // Call this method to request Motion Authorization for iOS.
@@ -126,7 +126,7 @@ RNHyperTrack.setUserId("YOUR_USER_ID");
 In case you do not have a user, you can create a new user. Calling this API configures the sdk by creating a new user or fetching the existing one, if one exists with the given lookupId.
 
 ```javascript
-RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId, (success) => {
+RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId).then((success) => {
       // Handle getOrCreateUser API success here
       console.log("getOrCreateUser success: ", success);
     }, (error) => {
@@ -139,7 +139,7 @@ RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId, (success) => {
 To start tracking on the SDK, use the following method.
 
 ```javascript
-RNHyperTrack.startTracking((success) => {
+RNHyperTrack.startTracking().then((success) => {
       // Handle startTracking API success here
       console.log("startTracking success: ", success);
     },
@@ -158,15 +158,13 @@ var params = {
   'expected_at': '2017-07-06T01:00:00.000Z'
 }
 
-RNHyperTrack.createAndAssignAction(params,
-    (success) => {
+RNHyperTrack.createAndAssignAction(params).then((success) => {
         // Handle createAndAssignAction API success here
         console.log('createAndAssignAction: ', success);
     }, (error) => {
         // Handle createAndAssignAction API error here
         console.log('createAndAssignAction: ', error);
-    }
-);
+    });
 ```
 
 #### 6. Completing an action
