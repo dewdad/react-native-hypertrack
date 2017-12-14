@@ -1,6 +1,6 @@
 {
   "name": "react-native-hypertrack",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "React native module for hypertrack SDKs",
   "main": "index.js",
   "scripts": {
