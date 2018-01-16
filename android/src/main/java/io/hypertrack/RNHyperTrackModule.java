@@ -1,81 +1,54 @@
 
 package io.hypertrack;
 
-import android.widget.Toast;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
-import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.bridge.LifecycleEventListener;
-import com.facebook.react.bridge.Promise;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.GsonBuilder;
 import com.hypertrack.lib.HyperTrack;
 import com.hypertrack.lib.HyperTrackConstants;
 import com.hypertrack.lib.callbacks.HyperTrackCallback;
-import com.hypertrack.lib.callbacks.HyperTrackEventCallback;
-import com.hypertrack.lib.internal.transmitter.models.HyperTrackEvent;
-import com.hypertrack.lib.internal.common.util.DateTimeUtility;
 import com.hypertrack.lib.internal.common.models.VehicleType;
-import com.hypertrack.lib.models.Place;
+import com.hypertrack.lib.internal.common.util.DateTimeUtility;
+import com.hypertrack.lib.internal.transmitter.models.UserActivity;
 import com.hypertrack.lib.models.Action;
-import com.hypertrack.lib.models.GeoJSONLocation;
-import com.hypertrack.lib.models.ActionParams;
 import com.hypertrack.lib.models.ActionParamsBuilder;
 import com.hypertrack.lib.models.ErrorResponse;
+import com.hypertrack.lib.models.GeoJSONLocation;
+import com.hypertrack.lib.models.HyperTrackLocation;
 import com.hypertrack.lib.models.SuccessResponse;
 import com.hypertrack.lib.models.User;
+import com.hypertrack.lib.models.UserParams;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import com.google.android.gms.maps.model.LatLng;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RNHyperTrackModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
+    private static final String TAG = RNHyperTrackModule.class.getSimpleName();
     private final ReactApplicationContext reactContext;
 
     public RNHyperTrackModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-
-        // Set Callback to receive events & errors
-        HyperTrack.setCallback(new HyperTrackEventCallback() {
-            @Override
-            public void onEvent(@NonNull final HyperTrackEvent event) {
-                // handle event received here
-                if (event.getEventType() == HyperTrackEvent.EventType.LOCATION_CHANGED_EVENT) {
-                    sendLocationChangedEvent(event);
-                }
-            }
-
-            @Override
-            public void onError(@NonNull final ErrorResponse errorResponse) {
-                // handle event received here
-            }
-        });
+        reactContext.addLifecycleEventListener(this);
     }
 
     @Override
@@ -84,8 +57,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
-    * HyperTrackEvent methods
-    **/
+     * HyperTrackEvent methods
+     **/
 
     private void sendEvent(String eventName, WritableMap params) {
         getReactApplicationContext()
@@ -93,18 +66,27 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
                 .emit(eventName, params);
     }
 
-    private void sendLocationChangedEvent(final HyperTrackEvent event) {
+    private void sendLocationChangedEvent(HyperTrackLocation hyperTrackLocation) {
         // Send this event to js
-        GeoJSONLocation geojson = event.getLocation().getGeoJSONLocation();
+        GeoJSONLocation geojson = hyperTrackLocation.getGeoJSONLocation();
         String serializedGeojson = new GsonBuilder().create().toJson(geojson);
         WritableMap params = Arguments.createMap();
         params.putString("geojson", serializedGeojson);
+        Log.d(TAG, "sendLocationChangedEvent: " + serializedGeojson);
         sendEvent("location.changed", params);
     }
 
+    private void sendCurrentActivityEvent(UserActivity userActivity) {
+        String serializedUserActivityJson = new GsonBuilder().create().toJson(userActivity);
+        WritableMap params = Arguments.createMap();
+        params.putString("activity", serializedUserActivityJson);
+        Log.d(TAG, "sendCurrentActivityEvent: " + serializedUserActivityJson);
+        sendEvent("activity.changed", params);
+    }
+
     /**
-    * Initialization methods
-    **/
+     * Initialization methods
+     **/
 
     @ReactMethod
     public void initialize(String publishableKey) {
@@ -119,12 +101,14 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
-    * Setup methods
-    **/
+     * Setup methods
+     **/
 
     @ReactMethod
     public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Promise promise) {
-        HyperTrack.getOrCreateUser(userName, phoneNumber, lookupId, new HyperTrackCallback() {
+        UserParams userParams = new UserParams();
+        userParams.setName(userName).setPhone(phoneNumber).setLookupId(lookupId);
+        HyperTrack.getOrCreateUser(userParams, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
@@ -149,9 +133,9 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
-    * Location permission methods
-    **/
-   
+     * Location permission methods
+     **/
+
     @ReactMethod
     public void locationAuthorizationStatus(final Promise promise) {
         // callback.invoke(HyperTrack.checkLocationPermission(reactContext));
@@ -169,8 +153,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
-    * Location services methods
-    **/
+     * Location services methods
+     **/
 
     @ReactMethod
     public void locationServicesEnabled(final Promise promise) {
@@ -184,8 +168,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
-    * Util methods
-    **/
+     * Util methods
+     **/
 
     @ReactMethod
     public void getUserId(Promise promise) {
@@ -230,7 +214,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Handle getCurrentLocation API success here
                 Location location = (Location) response.getResponseObject();
-                
+
                 WritableMap locationMap = Arguments.createMap();
                 locationMap.putDouble("latitude", location.getLatitude());
                 locationMap.putDouble("longitude", location.getLongitude());
@@ -255,8 +239,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
-    * Basic integration methods
-    **/
+     * Basic integration methods
+     **/
 
     @ReactMethod
     public void startTracking(final Promise promise) {
@@ -286,17 +270,17 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     @ReactMethod
     public void startMockTracking(final Promise promise) {
         HyperTrack.startMockTracking(
-            new HyperTrackCallback() {
-                @Override
-                public void onSuccess(@NonNull SuccessResponse response) {
-                    
-                }
+                new HyperTrackCallback() {
+                    @Override
+                    public void onSuccess(@NonNull SuccessResponse response) {
 
-                @Override
-                public void onError(@NonNull ErrorResponse errorResponse) {
+                    }
 
+                    @Override
+                    public void onError(@NonNull ErrorResponse errorResponse) {
+
+                    }
                 }
-            }
         );
     }
 
@@ -306,8 +290,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     /**
-    * Action methods
-    **/
+     * Action methods
+     **/
 
     @ReactMethod
     public void createAndAssignAction(ReadableMap params, final Promise promise) {
@@ -404,11 +388,50 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @Override
-    public void onHostDestroy() { }
+    public void onHostDestroy() {
+        Log.d(TAG, "onHostDestroy: ");
+    }
+
 
     @Override
-    public void onHostPause() { }
+    public void onHostPause() {
+        Log.d(TAG, "onHostPause: ");
+        unRegisterBroadcastReceiver();
+    }
 
     @Override
-    public void onHostResume() { }
+    public void onHostResume() {
+        Log.d(TAG, "onHostResume: ");
+        registerBroadcastReceiver();
+    }
+
+    private void registerBroadcastReceiver() {
+        Log.d(TAG, "registerBroadcastReceiver: ");
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(HyperTrackConstants.HT_USER_CURRENT_ACTIVITY_INTENT);
+        intentFilter.addAction(HyperTrackConstants.HT_USER_CURRENT_LOCATION_INTENT);
+        LocalBroadcastManager.getInstance(reactContext).registerReceiver(mMessageReceiver, intentFilter);
+    }
+
+    private void unRegisterBroadcastReceiver() {
+        Log.d(TAG, "unRegisterBroadcastReceiver: ");
+        LocalBroadcastManager.getInstance(reactContext).unregisterReceiver(mMessageReceiver);
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && intent.getAction() != null) {
+                if (intent.getAction().equals(HyperTrackConstants.HT_USER_CURRENT_ACTIVITY_INTENT)) {
+                    UserActivity userActivity = (UserActivity) intent.getSerializableExtra(HyperTrackConstants.HT_USER_CURRENT_ACTIVITY_KEY);
+                    sendCurrentActivityEvent(userActivity);
+                }
+                if (intent.getAction().equals(HyperTrackConstants.HT_USER_CURRENT_LOCATION_INTENT)) {
+                    HyperTrackLocation hyperTrackLocation = (HyperTrackLocation) intent.getSerializableExtra(HyperTrackConstants.HT_USER_CURRENT_LOCATION_KEY);
+                    sendLocationChangedEvent(hyperTrackLocation);
+                }
+            }
+        }
+    };
+
 }
