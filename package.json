@@ -1,13 +1,15 @@
 {
   "name": "react-native-hypertrack",
-  "version": "2.2.2",
+  "version": "3.0.0",
   "description": "React native module for hypertrack SDKs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "react-native", "hypertrack", "location"
+    "react-native",
+    "hypertrack",
+    "location"
   ],
   "author": "HyperTrack <support@hypertrack.io> (https://www.hypertrack.io/)",
   "repository": {
@@ -15,6 +17,5 @@
     "url": "git://github.com/hypertrack/react-native-hypertrack.git"
   },
   "license": "MIT",
-  "peerDependencies": {
-  }
+  "peerDependencies": {}
 }
