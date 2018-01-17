@@ -15,7 +15,7 @@ $ react-native link react-native-hypertrack
 
 ## Getting Started Android 
 
-### Upgrade compileSdkVersion, buildToolsVersion, support library version - 2
+1. Upgrade compileSdkVersion, buildToolsVersion, support library version
 For the Android SDK, edit the `build.gradle` file in your `android/app` directory 
 * https://github.com/hypertrack/react-native-sdk-onboarding/blob/master/android/build.gradle
 * L86, L87, L131
@@ -39,7 +39,7 @@ dependencies {
 }
 ```
 
-### Adds maven dependency for Google Libraries
+2. Adds maven dependency for Google Libraries
 For the Android SDK, edit the `build.gradle` file in your `android` directory 
 
 ```groovy
