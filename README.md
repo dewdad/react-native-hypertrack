@@ -20,62 +20,62 @@ For the Android SDK, edit the `build.gradle` file in your `android/app` director
 * https://github.com/hypertrack/react-native-sdk-onboarding/blob/master/android/build.gradle
 * L86, L87, L131
 
-```groovy
-android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.3"
-    ...
-}
-```
+    ```groovy
+    android {
+        compileSdkVersion 26
+        buildToolsVersion "26.0.3"
+        ...
+    }
+    ```
 
-```groovy
-dependencies {
-    ...
-    compile project(':react-native-hypertrack')
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:26.1.0"
-    compile "com.facebook.react:react-native:+"  // From node_modules
-    ...
-}
-```
+    ```groovy
+    dependencies {
+        ...
+        compile project(':react-native-hypertrack')
+        compile fileTree(dir: "libs", include: ["*.jar"])
+        compile "com.android.support:appcompat-v7:26.1.0"
+        compile "com.facebook.react:react-native:+"  // From node_modules
+        ...
+    }
+    ```
 
 2. Adds maven dependency for Google Libraries
 For the Android SDK, edit the `build.gradle` file in your `android` directory 
 
-```groovy
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
+    ```groovy
+    // Top-level build file where you can add configuration options common to all sub-projects/modules.
+    buildscript {
+        repositories {
+            jcenter()
+            maven {
+                url 'https://maven.google.com/'
+                name 'Google'
+            }
         }
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath 'com.google.gms:google-services:3.1.0'
+        dependencies {
+            classpath 'com.android.tools.build:gradle:3.0.1'
+            classpath 'com.google.gms:google-services:3.1.0'
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+            // NOTE: Do not place your application dependencies here; they belong
+            // in the individual module build.gradle files
+        }
     }
-}
 
-allprojects {
-    repositories {
-        mavenLocal()
-        jcenter()
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url "$rootDir/../node_modules/react-native/android"
-        }
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
+    allprojects {
+        repositories {
+            mavenLocal()
+            jcenter()
+            maven {
+                // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+                url "$rootDir/../node_modules/react-native/android"
+            }
+            maven {
+                url 'https://maven.google.com/'
+                name 'Google'
+            }
         }
     }
-}
-```
+    ```
 
 ## Getting started - iOS
 1. The native iOS SDKs need to be setup using Cocoapods. In your project's `ios` directory, create a Podfile.
