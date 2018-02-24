@@ -4,6 +4,6 @@
 
 @import HyperTrack;
 
-@interface RNHyperTrack : RCTEventEmitter <RCTBridgeModule, HyperTrackDelegate>
+@interface RNHyperTrack : RCTEventEmitter <RCTBridgeModule, HTEventsDelegate>
 
 @end

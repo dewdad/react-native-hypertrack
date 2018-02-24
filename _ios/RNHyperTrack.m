@@ -28,8 +28,8 @@ RCT_EXPORT_MODULE();
 - (void) didReceiveEvent:(HyperTrackEvent *)event {
   // HyperTrack delegate method
   // Process events
-  if (event.location != nil) {
-    [self sendEventWithName:@"location.changed" body:@{@"geojson": [event.location.location toJson]}];
+  if ([event getLocation] != nil) {
+    [self sendEventWithName:@"location.changed" body:@{@"geojson": [[event getLocation].location toJson]}];
   }
 }
 
@@ -47,7 +47,7 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(initialize :(NSString *)token) {
   RCTLogInfo(@"Initializing HyperTrack with token: %@", token);
   [HyperTrack initialize:token];
-  [HyperTrack setDelegate:self];
+  [HyperTrack setEventsDelegate:self];
 }
 
 
