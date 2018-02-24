@@ -288,6 +288,12 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
     [htActionParams setLookupId: params[@"lookup_id"]];
   }
   
+  if([params objectForKey: @"expected_place"]){
+      HyperTrackPlace * place = [HyperTrackPlace fromDictWithDict:params[@"expected_place"]];
+      [htActionParams setExpectedPlace: place]
+  }
+  
+  
   [HyperTrack createAndAssignAction:htActionParams
                                    :^(HyperTrackAction * _Nullable action,
                                       HyperTrackError * _Nullable error) {
