@@ -87,6 +87,7 @@ module.exports = {
         // actionParams is a dictionary with following keys
         // expected_at: ISO datetime string
         // expected_place_id: uuid of expected place
+        // expected_place: Place dictionary
         // lookup_id: string object for action lookup id
         // type: string object, that can be one of "visit", "pickup", "delivery"
         return RNHyperTrack.createAndAssignAction(actionParams);
@@ -105,6 +106,21 @@ module.exports = {
     // Method to complete an action
     completeAction(actionId) {
         RNHyperTrack.completeAction(actionId);
+    },
+
+    //Method to complete action synchronously
+    completeActionInSync(actionId){
+        return RNHyperTrack.completeActionInSync(actionId);
+    },
+
+    // Method to complete an action
+    completeActionWithLookupId(lookupId) {
+        RNHyperTrack.completeActionWithLookupId(lookupId);
+    },
+
+    //Method to complete action synchronously
+    completeActionWithLookupIdInSync(lookupId){
+        return RNHyperTrack.completeActionWithLookupIdInSync(lookupId);
     },
 
     /**

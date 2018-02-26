@@ -28,8 +28,8 @@ RCT_EXPORT_MODULE();
 - (void) didReceiveEvent:(HyperTrackEvent *)event {
   // HyperTrack delegate method
   // Process events
-  if (event.location != nil) {
-    [self sendEventWithName:@"location.changed" body:@{@"geojson": [event.location.location toJson]}];
+  if ([event getLocation] != nil) {
+    [self sendEventWithName:@"location.changed" body:@{@"geojson": [[event getLocation].location toJson]}];
   }
 }
 
@@ -47,7 +47,7 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(initialize :(NSString *)token) {
   RCTLogInfo(@"Initializing HyperTrack with token: %@", token);
   [HyperTrack initialize:token];
-  [HyperTrack setDelegate:self];
+  [HyperTrack setEventsDelegateWithEventDelegate:self];
 }
 
 
@@ -287,6 +287,16 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
   if ([params objectForKey: @"lookup_id"]) {
     [htActionParams setLookupId: params[@"lookup_id"]];
   }
+
+  if ([params objectForKey: @"collection_id"]) {
+    [htActionParams setCollectionId: params[@"collection_id"]];
+  }
+  
+  if([params objectForKey: @"expected_place"]){
+    HyperTrackPlace * place = [HyperTrackPlace placeFromDictWithDict:[params objectForKey: @"expected_place"]];
+    [htActionParams setExpectedPlace: place];
+  }
+  
   
   [HyperTrack createAndAssignAction:htActionParams
                                    :^(HyperTrackAction * _Nullable action,
@@ -347,6 +357,25 @@ RCT_EXPORT_METHOD(getAction :(NSString *)actionId resolve:(RCTPromiseResolveBloc
 
 RCT_EXPORT_METHOD(completeAction :(NSString *)actionId) {
   [HyperTrack completeAction:actionId];
+}
+
+RCT_EXPORT_METHOD(completeActionInSync :(NSString *)actionId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack completeActionInSynch:actionId
+      completionHandler:^(HyperTrackAction * action, HyperTrackError * error) {
+        if (error) {
+          // Handle error and call failure callback
+          NSError * nsError = [self getErrorFromHyperTrackError:error];
+          reject(@"Error", @"", nsError);
+          return;
+        }
+        
+        if (action) {
+          // Send action to success callback
+          resolve(@[[action toJson]]);
+        }
+
+    }];
 }
 
 
