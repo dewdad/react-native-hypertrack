@@ -33,6 +33,7 @@ import com.hypertrack.lib.models.ActionParamsBuilder;
 import com.hypertrack.lib.models.ErrorResponse;
 import com.hypertrack.lib.models.GeoJSONLocation;
 import com.hypertrack.lib.models.HyperTrackLocation;
+import com.hypertrack.lib.models.Place;
 import com.hypertrack.lib.models.SuccessResponse;
 import com.hypertrack.lib.models.User;
 import com.hypertrack.lib.models.UserParams;
@@ -91,6 +92,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     @ReactMethod
     public void initialize(String publishableKey) {
         HyperTrack.initialize(getReactApplicationContext(), publishableKey);
+        HyperTrack.enableDebugLogging(Log.ASSERT);
     }
 
     @ReactMethod
@@ -313,15 +315,15 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             actionParamsBuilder.setExpectedAt(DateTimeUtility.getFormattedDate(params.getString("expected_at")));
         }
 
-        if (params.hasKey("collection_id")){
-            actionParamsBuilder.setCollectionId(params.getString("collection_id"))
+        if (params.hasKey("collection_id")) {
+            actionParamsBuilder.setCollectionId(params.getString("collection_id"));
         }
 
-        if(params.hasKey("expected_place")){
-            
-        }
+        if (params.hasKey("expected_place")) {
+            Place place = getPlaceObject(params.getMap("expected_place"));
 
-        
+            actionParamsBuilder.setExpectedPlace(place);
+        }
 
         HyperTrack.createAndAssignAction(actionParamsBuilder.build(), new HyperTrackCallback() {
             @Override
@@ -340,6 +342,39 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
                 promise.reject(serializedError);
             }
         });
+    }
+
+    private Place getPlaceObject(ReadableMap expectedPlaceParams) {
+        Place place = new Place();
+        if (expectedPlaceParams.hasKey("name"))
+            place.setName(expectedPlaceParams.getString("name"));
+        if (expectedPlaceParams.hasKey("address"))
+            place.setAddress(expectedPlaceParams.getString("address"));
+        if (expectedPlaceParams.hasKey("locality"))
+            place.setLocality(expectedPlaceParams.getString("locality"));
+        if (expectedPlaceParams.hasKey("landmark"))
+            place.setLandmark(expectedPlaceParams.getString("landmark"));
+        if (expectedPlaceParams.hasKey("zip_code"))
+            place.setZipCode(expectedPlaceParams.getString("zip_code"));
+        if (expectedPlaceParams.hasKey("city"))
+            place.setCity(expectedPlaceParams.getString("city"));
+        if (expectedPlaceParams.hasKey("state"))
+            place.setState(expectedPlaceParams.getString("state"));
+        if (expectedPlaceParams.hasKey("country"))
+            place.setCountry(expectedPlaceParams.getString("country"));
+        if (expectedPlaceParams.hasKey("location")) {
+            LatLng latLng = getGeoJsonObject(expectedPlaceParams.getMap("location"));
+            place.setLocation(new GeoJSONLocation(latLng));
+        }
+        return place;
+    }
+
+    private LatLng getGeoJsonObject(ReadableMap location) {
+        if (location.hasKey("coordinates")) {
+            ReadableArray coordinates = location.getArray("coordinates");
+            LatLng latLng = new LatLng(coordinates.getDouble(0), coordinates.getDouble(1));
+            return latLng;
+        } else return null;
     }
 
     @ReactMethod
@@ -398,7 +433,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void completeActionInSync(String actionId, final Promise promise){
+    public void completeActionInSync(String actionId, final Promise promise) {
         HyperTrack.completeActionInSync(actionId, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
@@ -418,7 +453,33 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             }
         });
     }
-    
+
+    @ReactMethod
+    public void completeActionWithLookupId(String lookupId) {
+        HyperTrack.completeActionWithLookupId(lookupId);
+    }
+
+    @ReactMethod
+    public void completeActionWithLookupIdInSync(String lookupId, final Promise promise) {
+        HyperTrack.completeActionWithLookupIdInSync(lookupId, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
+            }
+        });
+    }
 
     @Override
     public void onHostDestroy() {
