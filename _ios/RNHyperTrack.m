@@ -287,6 +287,10 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
   if ([params objectForKey: @"lookup_id"]) {
     [htActionParams setLookupId: params[@"lookup_id"]];
   }
+
+  if ([params objectForKey: @"collection_id"]) {
+    [htActionParams setCollectionId: params[@"collection_id"]];
+  }
   
   if([params objectForKey: @"expected_place"]){
       HyperTrackPlace * place = [HyperTrackPlace fromDictWithDict:params[@"expected_place"]];
@@ -355,7 +359,7 @@ RCT_EXPORT_METHOD(completeAction :(NSString *)actionId) {
   [HyperTrack completeAction:actionId];
 }
 
-RCT_EXPORT_METHOD(completeActionInSynch :(NSString *)actionId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(completeActionInSync :(NSString *)actionId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   [HyperTrack completeActionInSynch:actionId
       completionHandler:^(HyperTrackAction * action, HyperTrackError * error) {
