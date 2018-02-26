@@ -17,7 +17,7 @@ RCT_EXPORT_MODULE();
 
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
-}f
+}
 
 
 - (NSArray<NSString *> *)supportedEvents {
@@ -47,7 +47,7 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(initialize :(NSString *)token) {
   RCTLogInfo(@"Initializing HyperTrack with token: %@", token);
   [HyperTrack initialize:token];
-  [HyperTrack setEventsDelegate:self];
+  [HyperTrack setEventsDelegateWithEventDelegate:self];
 }
 
 
@@ -293,8 +293,8 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
   }
   
   if([params objectForKey: @"expected_place"]){
-      HyperTrackPlace * place = [HyperTrackPlace fromDictWithDict:params[@"expected_place"]];
-      [htActionParams setExpectedPlace: place]
+    HyperTrackPlace * place = [HyperTrackPlace placeFromDictWithDict:[params objectForKey: @"expected_place"]];
+    [htActionParams setExpectedPlace: place];
   }
   
   

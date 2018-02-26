@@ -322,6 +322,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         if (params.hasKey("expected_place")) {
             Place place = getPlaceObject(params.getMap("expected_place"));
 
+
             actionParamsBuilder.setExpectedPlace(place);
         }
 
