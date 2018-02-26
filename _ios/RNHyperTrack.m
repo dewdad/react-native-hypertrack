@@ -17,7 +17,7 @@ RCT_EXPORT_MODULE();
 
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
-}
+}f
 
 
 - (NSArray<NSString *> *)supportedEvents {
@@ -355,5 +355,43 @@ RCT_EXPORT_METHOD(completeAction :(NSString *)actionId) {
   [HyperTrack completeAction:actionId];
 }
 
+RCT_EXPORT_METHOD(completeActionInSynch :(NSString *)actionId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack completeActionInSynch:actionId
+      completionHandler:^(HyperTrackAction * action, HyperTrackError * error) {
+        if (error) {
+          // Handle error and call failure callback
+          NSError * nsError = [self getErrorFromHyperTrackError:error];
+          reject(@"Error", @"", nsError);
+          return;
+        }
+        
+        if (action) {
+          // Send action to success callback
+          resolve(@[[action toJson]]);
+        }
+
+    }];
+}
+
+
+RCT_EXPORT_METHOD(completeActionWithLookUpId :(NSString *)lookupId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack completeActionWithLookupId:lookupId 
+      completionHandler:^(HyperTrackAction * action, HyperTrackError * error){
+        if (error) {
+          // Handle error and call failure callback
+          NSError * nsError = [self getErrorFromHyperTrackError:error];
+          reject(@"Error", @"", nsError);
+          return;
+        }
+        
+        if (action) {
+          // Send action to success callback
+          resolve(@[[action toJson]]);
+        }
+
+    }];
+}
 
 @end
