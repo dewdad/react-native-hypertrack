@@ -379,23 +379,4 @@ RCT_EXPORT_METHOD(completeActionInSync :(NSString *)actionId  resolve:(RCTPromis
 }
 
 
-RCT_EXPORT_METHOD(completeActionWithLookUpId :(NSString *)lookupId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-  [HyperTrack completeActionWithLookupId:lookupId 
-      completionHandler:^(HyperTrackAction * action, HyperTrackError * error){
-        if (error) {
-          // Handle error and call failure callback
-          NSError * nsError = [self getErrorFromHyperTrackError:error];
-          reject(@"Error", @"", nsError);
-          return;
-        }
-        
-        if (action) {
-          // Send action to success callback
-          resolve(@[[action toJson]]);
-        }
-
-    }];
-}
-
 @end
