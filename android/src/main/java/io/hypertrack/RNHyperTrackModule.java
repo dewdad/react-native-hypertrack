@@ -313,6 +313,16 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
             actionParamsBuilder.setExpectedAt(DateTimeUtility.getFormattedDate(params.getString("expected_at")));
         }
 
+        if (params.hasKey("collection_id")){
+            actionParamsBuilder.setCollectionId(params.getString("collection_id"))
+        }
+
+        if(params.hasKey("expected_place")){
+            
+        }
+
+        
+
         HyperTrack.createAndAssignAction(actionParamsBuilder.build(), new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
