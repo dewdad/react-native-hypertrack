@@ -314,11 +314,11 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         }
 
         if (params.hasKey("collection_id")){
-            actionParamsBuilder.setCollectionId(params.getString("collection_id"))
+            actionParamsBuilder.setCollectionId(params.getString("collection_id"));
         }
 
         if(params.hasKey("expected_place")){
-            
+
         }
 
         
