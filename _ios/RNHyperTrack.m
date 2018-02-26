@@ -293,8 +293,8 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
   }
   
   if([params objectForKey: @"expected_place"]){
-      HyperTrackPlace * place = [HyperTrackPlace fromDictWithDict:params[@"expected_place"]];
-      [htActionParams setExpectedPlace: place];
+    HyperTrackPlace * place = [HyperTrackPlace placeFromDictWithDict:[params objectForKey: @"expected_place"]];
+    [htActionParams setExpectedPlace: place];
   }
   
   
