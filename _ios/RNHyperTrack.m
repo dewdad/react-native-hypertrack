@@ -298,6 +298,68 @@ RCT_EXPORT_METHOD(getAction :(NSString *)actionId resolve:(RCTPromiseResolveBloc
       }];
 }
 
+RCT_EXPORT_METHOD(getActionForUniqueId :(NSString *)uniqueId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack getActionsForUniqueId:uniqueId :^(NSArray<HTAction *> * _Nullable actions, HTError * _Nullable error) {
+    if (error) {
+      // Handle error and call failure callback
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
+      return;
+    }
+    
+    if (actions) {
+      // Send action to success callback
+      NSMutableArray *array = [[NSMutableArray alloc] init];
+      for (HTAction *action in actions) {
+        [array addObject:[action toJson]];
+      }
+      resolve(array);
+    }
+  }];
+}
+
+RCT_EXPORT_METHOD(getActionForCollectionId :(NSString *)collectionId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack getActionsForCollectionId:collectionId completionHandler:^(NSArray<HTAction *> * _Nullable actions, HTError * _Nullable error) {
+    if (error) {
+      // Handle error and call failure callback
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
+      return;
+    }
+    
+    if (actions) {
+      // Send action to success callback
+      NSMutableArray *array = [[NSMutableArray alloc] init];
+      for (HTAction *action in actions) {
+        [array addObject:[action toJson]];
+      }
+      resolve(array);
+    }
+  }];
+}
+
+RCT_EXPORT_METHOD(getActionForShortCode :(NSString *)shortCode resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack getActionsForShortCode:shortCode :^(NSArray<HTAction *> * _Nullable actions, HTError * _Nullable error) {
+    if (error) {
+      // Handle error and call failure callback
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
+      return;
+    }
+    
+    if (actions) {
+      // Send action to success callback
+      NSMutableArray *array = [[NSMutableArray alloc] init];
+      for (HTAction *action in actions) {
+        [array addObject:[action toJson]];
+      }
+      resolve(array);
+    }
+  }];
+}
 
 RCT_EXPORT_METHOD(completeAction :(NSString *)actionId) {
   [HyperTrack completeAction:actionId];
@@ -319,6 +381,94 @@ RCT_EXPORT_METHOD(completeActionInSync :(NSString *)actionId  resolve:(RCTPromis
         }
 
     }];
+}
+  
+RCT_EXPORT_METHOD(completeActionInSyncWithUniqueId :(NSString *)uniqueId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack completeActionWithUniqueIdInSync:uniqueId completionHandler:^(HTAction * _Nullable action, HTError * _Nullable error) {
+    if (error) {
+      // Handle error and call failure callback
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
+      return;
+    }
+    
+    if (action) {
+      // Send action to success callback
+      resolve(@[[action toJson]]);
+    }
+    
+  }];
+}
+
+RCT_EXPORT_METHOD(updateUser :(NSString *)name :(NSString *)phone :(NSString *)uniqueId :(UIImage *)photo resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+[HyperTrack updateUserWithName:name phone:phone uniqueId:uniqueId photo:photo
+                  completionHandler:^(HTUser * _Nullable user, HTError * _Nullable error) {
+                    if (user) {
+                      resolve(@[[user toJson]]);
+                    } else if (error) {
+                      NSError * nsError = [self getErrorFromHyperTrackError:error];
+                      reject(@"Error", @"", nsError);
+                    }
+                  }];
+}
+  
+/**
+ Remote notifications methods
+ */
+
+  
+RCT_EXPORT_METHOD(registerForNotifications)
+{
+  [HyperTrack registerForNotifications];
+}
+
+RCT_EXPORT_METHOD(didRegisterForRemoteNotificationsWithDeviceToken :(NSData *) deviceToken)
+{
+  [HyperTrack didRegisterForRemoteNotificationsWithDeviceTokenWithDeviceToken:deviceToken];
+}
+
+RCT_EXPORT_METHOD(didFailToRegisterForRemoteNotificationsWithError :(NSError *) error)
+{
+  [HyperTrack didFailToRegisterForRemoteNotificationsWithErrorWithError:error];
+}
+
+RCT_EXPORT_METHOD(didReceiveRemoteNotificationWithUserInfo :(NSDictionary *) userInfo)
+{
+  [HyperTrack didReceiveRemoteNotificationWithUserInfo:userInfo];
+}
+
+RCT_EXPORT_METHOD(isHyperTrackNotification: (NSDictionary *) userInfo :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  resolve(@[[NSNumber numberWithBool:[HyperTrack isHyperTrackNotificationWithUserInfo:userInfo]]]);
+}
+
+RCT_EXPORT_METHOD(getPlaceline: (NSDate *) date :(NSString *)userId :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  [HyperTrack getPlacelineWithDate:date userId:userId completionHandler:^(HTPlaceline * _Nullable placeline, HTError * _Nullable error) {
+       if (placeline) {
+         resolve(@[[placeline toJson]]);
+       } else if (error) {
+         NSError * nsError = [self getErrorFromHyperTrackError:error];
+         reject(@"Error", @"", nsError);
+       }
+     }];
+}
+
+RCT_EXPORT_METHOD(getPendingActions: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  [HyperTrack getPendingActionsWithCompletionHandler:^(NSArray<HTAction *> * _Nullable actions, HTError * _Nullable error) {
+    if (error) {
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
+      return;
+    }
+    if (actions) {
+      NSMutableArray *array = [[NSMutableArray alloc] init];
+      for (HTAction *action in actions) {
+        [array addObject:[action toJson]];
+      }
+      resolve(array);
+    }
+  }];
 }
 
 
