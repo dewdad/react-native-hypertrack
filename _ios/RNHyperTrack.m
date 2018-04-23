@@ -33,8 +33,7 @@ RCT_EXPORT_MODULE();
   }
 }
 
-
-- (void) didFailWithError:(HyperTrackError *)error {
+- (void) didFailWithError:(HTError *)error {
   // HyperTrack delegate method
   // Not handling failure at the moment
 }
@@ -60,7 +59,7 @@ RCT_EXPORT_METHOD(getPublishableKey :(RCTPromiseResolveBlock)resolve rejecter:(R
 /**
  Setup methods
  */
--(NSError *)getErrorFromHyperTrackError:(HyperTrackError *)hyperTrackError{
+-(NSError *)getErrorFromHyperTrackError:(HTError *)hyperTrackError {
   NSDictionary * userInfo = @{@"description":hyperTrackError.errorMessage};
   
   NSError * nsError = [NSError errorWithDomain:@"HyperTrackError"
@@ -70,23 +69,16 @@ RCT_EXPORT_METHOD(getPublishableKey :(RCTPromiseResolveBlock)resolve rejecter:(R
   return  nsError;
 }
 
-RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSString *)lookupId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  [HyperTrack getOrCreateUser:name _phone:phone :lookupId completionHandler:^(HyperTrackUser * _Nullable user, HyperTrackError * _Nullable error) {
-    if (error) {
-      NSError * nsError = [self getErrorFromHyperTrackError:error];
-      reject(@"Error", @"", nsError);
-    } else {
-      if (user) {
-        resolve(@[[user toJson]]);
-      }
-    }
-  }];
-}
-
-
-RCT_EXPORT_METHOD(setUserId :(NSString *)userId)
-{
-  [HyperTrack setUserId:userId];
+RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSString *)uniqueId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  [HyperTrack getOrCreateUserWithName:name phone:phone uniqueId:uniqueId
+                    completionHandler:^(HTUser * _Nullable user, HTError * _Nullable error) {
+                      if (user) {
+                        resolve(@[[user toJson]]);
+                      } else if (error) {
+                        NSError * nsError = [self getErrorFromHyperTrackError:error];
+                        reject(@"Error", @"", nsError);
+                      }
+                    }];
 }
 
 
@@ -118,16 +110,10 @@ RCT_EXPORT_METHOD(locationAuthorizationStatus :(RCTPromiseResolveBlock)resolve r
   }
 }
 
-
-RCT_EXPORT_METHOD(requestWhenInUseAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage)
+RCT_EXPORT_METHOD(requestAlwaysLocationAuthorization :(NSString *)rationaleTitle :(NSString *)rationaleMessage)
 {
-  [HyperTrack requestWhenInUseAuthorization];
-}
-
-
-RCT_EXPORT_METHOD(requestLocationAuthorization:(NSString *)rationaleTitle :(NSString *)rationaleMessage)
-{
-  [HyperTrack requestAlwaysAuthorization];
+  [HyperTrack requestAlwaysLocationAuthorizationWithCompletionHandler:^(BOOL authorized) {
+  }];
 }
 
 
@@ -153,9 +139,11 @@ RCT_EXPORT_METHOD(requestLocationServices)
  */
 
 
-RCT_EXPORT_METHOD(canAskMotionPermissions :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(motionAuthorizationStatus :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  resolve(@[[NSNumber numberWithBool:[HyperTrack canAskMotionPermissions]]]);
+  [HyperTrack motionAuthorizationStatusWithCompletionHandler:^(BOOL authorized) {
+    resolve(@[[NSNumber numberWithBool:authorized]]);
+  }];
 }
 
 
@@ -180,32 +168,10 @@ RCT_EXPORT_METHOD(getUserId :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromis
   resolve(@[[HyperTrack getUserId]]);
 }
 
-
-RCT_EXPORT_METHOD(getETA :(nonnull NSNumber *)latitude :(nonnull NSNumber *)longitude :(NSString *)vehicle resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-  CLLocationCoordinate2D coord;
-  coord.longitude = (CLLocationDegrees)[longitude doubleValue];
-  coord.latitude = (CLLocationDegrees)[latitude doubleValue];
-  
-  [HyperTrack getETAWithExpectedPlaceCoordinates:coord
-                                     vehicleType:vehicle
-                               completionHandler:^(NSNumber * _Nullable eta,
-                                                   HyperTrackError * _Nullable error) {
-                                 if (error) {
-                                   NSError * nsError = [self getErrorFromHyperTrackError:error];
-                                   reject(@"Error", @"", nsError);
-                                   return;
-                                 }
-                                 
-                                 resolve(@[eta]);
-                               }];
-}
-
-
 RCT_EXPORT_METHOD(getCurrentLocation :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   [HyperTrack getCurrentLocationWithCompletionHandler:^(CLLocation * _Nullable currentLocation,
-                                                        HyperTrackError * _Nullable error) {
+                                                        HTError * _Nullable error) {
     if (error) {
       NSError * nsError = [self getErrorFromHyperTrackError:error];
       reject(@"Error", @"", nsError);
@@ -231,9 +197,9 @@ RCT_EXPORT_METHOD(getCurrentLocation :(RCTPromiseResolveBlock)resolve rejecter:(
  */
 
 
-RCT_EXPORT_METHOD(startTracking :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(resumeTracking :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  [HyperTrack startTrackingWithCompletionHandler:^(HyperTrackError * _Nullable error) {
+  [HyperTrack resumeTrackingWithCompletionHandler:^(HTError * _Nullable error) {
     if (error) {
       NSError * nsError = [self getErrorFromHyperTrackError:error];
       reject(@"Error", @"", nsError);
@@ -245,22 +211,22 @@ RCT_EXPORT_METHOD(startTracking :(RCTPromiseResolveBlock)resolve rejecter:(RCTPr
 }
 
 
-RCT_EXPORT_METHOD(stopTracking)
+RCT_EXPORT_METHOD(pauseTracking)
 {
-  [HyperTrack stopTracking];
+  [HyperTrack pauseTracking];
 }
 
 
-RCT_EXPORT_METHOD(startMockTracking)
-{
-  [HyperTrack startMockTracking];
-}
-
-
-RCT_EXPORT_METHOD(stopMockTracking)
-{
-  [HyperTrack stopMockTracking];
-}
+//RCT_EXPORT_METHOD(startMockTracking)
+//{
+//  [HyperTrack startMockTracking];
+//}
+//
+//
+//RCT_EXPORT_METHOD(stopMockTracking)
+//{
+//  [HyperTrack stopMockTracking];
+//}
 
 
 /**
@@ -268,12 +234,12 @@ RCT_EXPORT_METHOD(stopMockTracking)
  */
 
 
-RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(createAction :(NSDictionary *) params resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  HyperTrackActionParams * htActionParams = [[HyperTrackActionParams alloc] init];
+  HTActionParams * htActionParams = [[HTActionParams alloc] init];
   
   if ([params objectForKey: @"expected_place_id"]) {
-    [htActionParams setExpectedPlaceId: params[@"expected_place_id"]];
+    [htActionParams setExpectedPlaceId:params[@"expected_place_id"]];
   }
   
   if ([params objectForKey: @"expected_at"]) {
@@ -284,8 +250,8 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
     [htActionParams setType: params[@"type"]];
   }
   
-  if ([params objectForKey: @"lookup_id"]) {
-    [htActionParams setLookupId: params[@"lookup_id"]];
+  if ([params objectForKey: @"unique_id"]) {
+    [htActionParams setUniqueId: params[@"unique_id"]];
   }
 
   if ([params objectForKey: @"collection_id"]) {
@@ -293,21 +259,20 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
   }
   
   if([params objectForKey: @"expected_place"]){
-    HyperTrackPlace * place = [HyperTrackPlace placeFromDictWithDict:[params objectForKey: @"expected_place"]];
+    HTPlace * place = [[HTPlace alloc] initWithDict:[params objectForKey: @"expected_place"]];
     [htActionParams setExpectedPlace: place];
   }
   
   
-  [HyperTrack createAndAssignAction:htActionParams
-                                   :^(HyperTrackAction * _Nullable action,
-                                      HyperTrackError * _Nullable error) {
+  [HyperTrack createAction:htActionParams
+                                   :^(HTAction * _Nullable action,
+                                      HTError * _Nullable error) {
                                      if (error) {
                                        // Handle createAndAssignAction API error here
                                        NSError * nsError = [self getErrorFromHyperTrackError:error];
                                        reject(@"Error", @"", nsError);
                                        return;
                                      }
-                                     
                                      if (action) {
                                        // Handle createAndAssignAction API success here
                                        resolve(@[[action toJson]]);
@@ -316,31 +281,10 @@ RCT_EXPORT_METHOD(createAndAssignAction :(NSDictionary *) params resolve:(RCTPro
   
 }
 
-
-RCT_EXPORT_METHOD(assignActions :(NSArray *)actionIds resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-  [HyperTrack assignActionsWithActionIds:actionIds :^(HyperTrackUser * _Nullable user, HyperTrackError * _Nullable error) {
-    
-    if (error) {
-      NSError * nsError = [self getErrorFromHyperTrackError:error];
-      reject(@"Error", @"", nsError);
-      return;
-    }
-    
-    if (user) {
-      resolve(@[[user toJson]]);
-    }
-    
-  }];
-}
-
-
 RCT_EXPORT_METHOD(getAction :(NSString *)actionId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  [HyperTrack getAction:actionId
-      completionHandler:^(HyperTrackAction * _Nullable action,
-                          HyperTrackError * _Nullable error) {
-        if (error) {
+  [HyperTrack getActionForActionId:actionId completionHandler:^(HTAction * _Nullable action, HTError * _Nullable error) {
+    if (error) {
           // Handle error and call failure callback
           NSError * nsError = [self getErrorFromHyperTrackError:error];
           reject(@"Error", @"", nsError);
@@ -361,8 +305,7 @@ RCT_EXPORT_METHOD(completeAction :(NSString *)actionId) {
 
 RCT_EXPORT_METHOD(completeActionInSync :(NSString *)actionId  resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  [HyperTrack completeActionInSynch:actionId
-      completionHandler:^(HyperTrackAction * action, HyperTrackError * error) {
+  [HyperTrack completeActionInSync:actionId completionHandler:^(HTAction * _Nullable action, HTError * _Nullable error) {
         if (error) {
           // Handle error and call failure callback
           NSError * nsError = [self getErrorFromHyperTrackError:error];
