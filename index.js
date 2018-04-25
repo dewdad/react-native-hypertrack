@@ -87,6 +87,18 @@ module.exports = {
         return RNHyperTrack.getAction(actionId);
     },
 
+    getActionForUniqueId(uniqueId) {
+        return RNHyperTrack.getActionForUniqueId(uniqueId);
+    }
+
+    getActionForCollectionId(collectionId) {
+        return RNHyperTrack.getActionForCollectionId(collectionId);
+    }
+
+    getActionForShortCode(shortCode) {
+        return RNHyperTrack.getActionForShortCode(shortCode);
+    }
+
     // Method to complete an action
     completeAction(actionId) {
         RNHyperTrack.completeAction(actionId);
@@ -133,5 +145,44 @@ module.exports = {
 
     requestMotionAuthorization() {
         RNHyperTrack.requestMotionAuthorization();
+    },
+
+    updateUser(name, phoneNumber, uniqueId, image) {
+        return RNHyperTrack.updateUser(name, phoneNumber, uniqueId, image);
+    },
+
+    getPlaceline(date, userId) {
+        return RNHyperTrack.getPlaceline(date, userId);
+    },
+
+    getPendingActions() {
+        return RNHyperTrack.getPendingActions();
+    },
+
+    /*
+    iOS remote notification methods
+    */
+    registerForNotifications() {
+        return RNHyperTrack.registerForNotifications();
+    },
+
+    didRegisterForRemoteNotificationsWithDeviceToken(token) {
+        return RNHyperTrack.didRegisterForRemoteNotificationsWithDeviceToken(token);
+    },
+
+    didFailToRegisterForRemoteNotificationsWithError(error) {
+        return RNHyperTrack.didFailToRegisterForRemoteNotificationsWithError(error);
+    },
+
+    didReceiveRemoteNotificationWithUserInfo(dict) {
+        return RNHyperTrack.didReceiveRemoteNotificationWithUserInfo(dict);
+    },
+
+    isHyperTrackNotification(dict) {
+        return RNHyperTrack.isHyperTrackNotification(dict);
+    },
+
+    getPendingActions() {
+        return RNHyperTrack.getPendingActions();
     }
 }
