@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -29,6 +30,7 @@ import com.hypertrack.lib.internal.common.models.VehicleType;
 import com.hypertrack.lib.internal.common.util.DateTimeUtility;
 import com.hypertrack.lib.internal.transmitter.models.UserActivity;
 import com.hypertrack.lib.models.Action;
+import com.hypertrack.lib.models.ActionParams;
 import com.hypertrack.lib.models.ActionParamsBuilder;
 import com.hypertrack.lib.models.ErrorResponse;
 import com.hypertrack.lib.models.GeoJSONLocation;
@@ -85,6 +87,38 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         sendEvent("activity.changed", params);
     }
 
+    private ActionParams mapParamsToActionParams(ReadableMap params) {
+        ActionParamsBuilder actionParamsBuilder = new ActionParamsBuilder();
+
+        if (params.hasKey("expected_place_id")) {
+            actionParamsBuilder.setExpectedPlaceId(params.getString("expected_place_id"));
+        }
+
+        if (params.hasKey("unique_id")) {
+            actionParamsBuilder.setUniqueId(params.getString("unique_id"));
+        }
+
+        if (params.hasKey("type")) {
+            actionParamsBuilder.setType(params.getString("type"));
+        }
+
+        if (params.hasKey("expected_at")) {
+            actionParamsBuilder.setExpectedAt(DateTimeUtility.getFormattedDate(params.getString("expected_at")));
+        }
+
+        if (params.hasKey("collection_id")) {
+            actionParamsBuilder.setCollectionId(params.getString("collection_id"));
+        }
+
+        if (params.hasKey("expected_place")) {
+            Place place = getPlaceObject(params.getMap("expected_place"));
+
+
+            actionParamsBuilder.setExpectedPlace(place);
+        }
+        return actionParamsBuilder.build();
+    }
+
     /**
      * Initialization methods
      **/
@@ -107,9 +141,9 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
      **/
 
     @ReactMethod
-    public void getOrCreateUser(String userName, String phoneNumber, String lookupId, final Promise promise) {
+    public void getOrCreateUser(String userName, String phoneNumber, String uniqueId, final Promise promise) {
         UserParams userParams = new UserParams();
-        userParams.setName(userName).setPhone(phoneNumber).setLookupId(lookupId);
+        userParams.setName(userName).setPhone(phoneNumber).setUniqueId(uniqueId);
         HyperTrack.getOrCreateUser(userParams, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
@@ -130,8 +164,29 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void setUserId(String userId) {
-        HyperTrack.setUserId(userId);
+    public void updateUser(String userName, String phoneNumber, String uniqueId, String photo, final Promise promise) {
+        UserParams userParams = new UserParams();
+        userParams.setName(userName).setPhone(phoneNumber).setUniqueId(uniqueId);
+        if (photo != null) {
+            userParams.setPhoto(photo);
+        }
+        HyperTrack.updateUser(userParams, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Return User object in successCallback
+                User user = (User) response.getResponseObject();
+                String serializedUser = new GsonBuilder().create().toJson(user);
+                // successCallback.invoke(serializedUser);
+                promise.resolve(serializedUser);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
+            }
+        });
     }
 
     /**
@@ -145,12 +200,7 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void requestWhenInUseAuthorization(String rationaleTitle, String rationaleMessage) {
-        HyperTrack.requestPermissions(getCurrentActivity(), rationaleTitle, rationaleMessage);
-    }
-
-    @ReactMethod
-    public void requestLocationAuthorization(String rationaleTitle, String rationaleMessage) {
+    public void requestAlwaysLocationAuthorization(String rationaleTitle, String rationaleMessage) {
         HyperTrack.requestPermissions(getCurrentActivity(), rationaleTitle, rationaleMessage);
     }
 
@@ -185,29 +235,6 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
         promise.resolve(HyperTrack.isTracking());
     }
 
-    @ReactMethod
-    public void getETA(final double expectedPlaceLat, final double expectedPlaceLng, final String vehicleType, final Promise promise) {
-        LatLng expectedLocation = new LatLng(expectedPlaceLat, expectedPlaceLng);
-        VehicleType vType = VehicleType.valueOf(vehicleType.toUpperCase());
-
-        HyperTrack.getETA(expectedLocation, vType, new HyperTrackCallback() {
-            @Override
-            public void onSuccess(@NonNull SuccessResponse response) {
-                // Handle getETA API success here
-                Double eta = (Double) response.getResponseObject();
-                // successCallback.invoke(eta);
-                promise.resolve(eta);
-            }
-
-            @Override
-            public void onError(@NonNull ErrorResponse errorResponse) {
-                // Handle getETA API error here
-                String serializedError = new GsonBuilder().create().toJson(errorResponse);
-                // errorCallback.invoke(serializedError);
-                promise.reject(serializedError);
-            }
-        });
-    }
 
     @ReactMethod
     public void getCurrentLocation(final Promise promise) {
@@ -245,8 +272,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
      **/
 
     @ReactMethod
-    public void startTracking(final Promise promise) {
-        HyperTrack.startTracking(new HyperTrackCallback() {
+    public void resumeTracking(final Promise promise) {
+        HyperTrack.resumeTracking(new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return User object in successCallback
@@ -265,14 +292,20 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void stopTracking() {
-        HyperTrack.stopTracking();
+    public void pauseTracking() {
+        HyperTrack.pauseTracking();
     }
 
     @ReactMethod
-    public void startMockTracking(final Promise promise) {
-        HyperTrack.startMockTracking(
-                new HyperTrackCallback() {
+    public void createMockAction(ReadableMap params, final Promise promise) {
+        ActionParams actionParams= mapParamsToActionParams(params);
+        LatLng latLng;
+        if (params.hasKey("location")) {
+            latLng = getGeoJsonObject(params.getMap("location"));
+        } else {
+            latLng = new LatLng(0, 0);
+        }
+        HyperTrack.createMockAction(actionParams, latLng, new HyperTrackCallback() {
                     @Override
                     public void onSuccess(@NonNull SuccessResponse response) {
 
@@ -287,8 +320,8 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void stopMockTracking() {
-        HyperTrack.stopMockTracking();
+    public void completeMockAction(String actionId) {
+        HyperTrack.completeMockAction(actionId);
     }
 
     /**
@@ -296,37 +329,9 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
      **/
 
     @ReactMethod
-    public void createAndAssignAction(ReadableMap params, final Promise promise) {
-        ActionParamsBuilder actionParamsBuilder = new ActionParamsBuilder();
-
-        if (params.hasKey("expected_place_id")) {
-            actionParamsBuilder.setExpectedPlaceId(params.getString("expected_place_id"));
-        }
-
-        if (params.hasKey("lookup_id")) {
-            actionParamsBuilder.setLookupId(params.getString("lookup_id"));
-        }
-
-        if (params.hasKey("type")) {
-            actionParamsBuilder.setType(params.getString("type"));
-        }
-
-        if (params.hasKey("expected_at")) {
-            actionParamsBuilder.setExpectedAt(DateTimeUtility.getFormattedDate(params.getString("expected_at")));
-        }
-
-        if (params.hasKey("collection_id")) {
-            actionParamsBuilder.setCollectionId(params.getString("collection_id"));
-        }
-
-        if (params.hasKey("expected_place")) {
-            Place place = getPlaceObject(params.getMap("expected_place"));
-
-
-            actionParamsBuilder.setExpectedPlace(place);
-        }
-
-        HyperTrack.createAndAssignAction(actionParamsBuilder.build(), new HyperTrackCallback() {
+    public void createAction(ReadableMap params, final Promise promise) {
+        ActionParams actionParams = mapParamsToActionParams(params);
+        HyperTrack.createAction(actionParams, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Return Action object in successCallback
@@ -379,26 +384,20 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void assignActions(final ReadableArray actionIds, final Promise promise) {
-        List<String> actionIdsStrings = new ArrayList<String>();
-
-        for (int i = 0; i < actionIds.size(); i++) {
-            actionIdsStrings.add(actionIds.getString(i));
-        }
-
-        HyperTrack.assignActions(actionIdsStrings, new HyperTrackCallback() {
+    public void getAction(String actionId, final Promise promise) {
+        HyperTrack.getAction(actionId, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
-                // Return User object in successCallback
-                User user = (User) response.getResponseObject();
-                String serializedUser = new GsonBuilder().create().toJson(user);
-                // successCallback.invoke(serializedUser);
-                promise.resolve(serializedUser);
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
             }
 
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
-                // Handle getETA API error here
+                // Handle getAction error here
                 String serializedError = new GsonBuilder().create().toJson(errorResponse);
                 // errorCallback.invoke(serializedError);
                 promise.reject(serializedError);
@@ -407,8 +406,52 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void getAction(String actionId, final Promise promise) {
-        HyperTrack.getAction(actionId, new HyperTrackCallback() {
+    public void getActionForUniqueId(String uniqueId, final Promise promise) {
+        HyperTrack.getActionForUniqueId(uniqueId, null, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getActionForCollectionId(String collectionId, final Promise promise) {
+        HyperTrack.getActionsForCollectionId(collectionId, null, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getActionForShortCode(String shortCode, final Promise promise) {
+        HyperTrack.getActionForShortCode(shortCode, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Handle getAction response here
@@ -456,13 +499,57 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
-    public void completeActionWithLookupId(String lookupId) {
-        HyperTrack.completeActionWithLookupId(lookupId);
+    public void completeActionWithUniqueId(String uniqueId) {
+        HyperTrack.completeActionWithUniqueId(uniqueId);
     }
 
     @ReactMethod
-    public void completeActionWithLookupIdInSync(String lookupId, final Promise promise) {
-        HyperTrack.completeActionWithLookupIdInSync(lookupId, new HyperTrackCallback() {
+    public void completeActionWithUniqueIdInSync(String uniqueId, final Promise promise) {
+        HyperTrack.completeActionWithUniqueIdInSync(uniqueId, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getPendingActions(final Promise promise) {
+        HyperTrack.getPendingActions(new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Handle getAction response here
+                Action actionResponse = (Action) response.getResponseObject();
+                String serializedAction = new GsonBuilder().create().toJson(actionResponse);
+                // successCallback.invoke(serializedAction);
+                promise.resolve(serializedAction);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                // Handle getAction error here
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getPlaceline(String date, String userId, final Promise promise) {
+        HyperTrack.getPlaceline(DateTimeUtility.getFormattedDate(date), new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse response) {
                 // Handle getAction response here
