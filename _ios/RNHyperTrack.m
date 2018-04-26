@@ -443,7 +443,7 @@ RCT_EXPORT_METHOD(isHyperTrackNotification: (NSDictionary *) userInfo :(RCTPromi
   resolve(@[[NSNumber numberWithBool:[HyperTrack isHyperTrackNotificationWithUserInfo:userInfo]]]);
 }
 
-RCT_EXPORT_METHOD(getPlaceline: (NSDate *) date :(NSString *)userId :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(getPlaceline: (NSString *) date :(NSString *)userId :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   [HyperTrack getPlacelineWithDate:date userId:userId completionHandler:^(HTPlaceline * _Nullable placeline, HTError * _Nullable error) {
        if (placeline) {
          resolve(@[[placeline toJson]]);

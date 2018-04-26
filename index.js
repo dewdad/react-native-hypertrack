@@ -58,15 +58,15 @@ module.exports = {
         RNHyperTrack.pauseTracking();
     },
 
-    // // start mock tracking
-    // startMockTracking() {
-    //     RNHyperTrack.startMockTracking();
-    // },
+    // start mock tracking
+    createMockAction(params) {
+        RNHyperTrack.createMockAction(params);
+    },
 
-    // // stop mock tracking
-    // stopMockTracking() {
-    //     RNHyperTrack.stopMockTracking();
-    // },
+    // stop mock tracking
+    completeMockAction(actionId) {
+        RNHyperTrack.completeMockAction(actionId);
+    },
 
     /**
      Action methods
@@ -89,15 +89,15 @@ module.exports = {
 
     getActionForUniqueId(uniqueId) {
         return RNHyperTrack.getActionForUniqueId(uniqueId);
-    }
+    },
 
     getActionForCollectionId(collectionId) {
         return RNHyperTrack.getActionForCollectionId(collectionId);
-    }
+    },
 
     getActionForShortCode(shortCode) {
         return RNHyperTrack.getActionForShortCode(shortCode);
-    }
+    },
 
     // Method to complete an action
     completeAction(actionId) {
