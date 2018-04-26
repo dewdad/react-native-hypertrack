@@ -38,6 +38,36 @@ RCT_EXPORT_MODULE();
   // Not handling failure at the moment
 }
 
+-(HTActionParams *) mapDictionaryToHTActionParams:(NSDictionary *) params {
+  HTActionParams * htActionParams = [[HTActionParams alloc] init];
+  
+  if ([params objectForKey: @"expected_place_id"]) {
+    [htActionParams setExpectedPlaceId:params[@"expected_place_id"]];
+  }
+  
+  if ([params objectForKey: @"expected_at"]) {
+    [htActionParams setExpectedAt: params[@"expected_at"]];
+  }
+  
+  if ([params objectForKey: @"type"]) {
+    [htActionParams setType: params[@"type"]];
+  }
+  
+  if ([params objectForKey: @"unique_id"]) {
+    [htActionParams setUniqueId: params[@"unique_id"]];
+  }
+  
+  if ([params objectForKey: @"collection_id"]) {
+    [htActionParams setCollectionId: params[@"collection_id"]];
+  }
+  
+  if([params objectForKey: @"expected_place"]){
+    HTPlace * place = [[HTPlace alloc] initWithDict:[params objectForKey: @"expected_place"]];
+    [htActionParams setExpectedPlace: place];
+  }
+  return htActionParams;
+}
+
 /**
  Initialization methods
  */
@@ -67,6 +97,10 @@ RCT_EXPORT_METHOD(getPublishableKey :(RCTPromiseResolveBlock)resolve rejecter:(R
                                       userInfo:userInfo];
 
   return  nsError;
+}
+
+-(NSError *)getInvalidParamsError {
+  return [[NSError alloc] initWithDomain:@"HyperTrackError" code:131 userInfo:@{@"description": @"Invalid Parameters supplied"}];
 }
 
 RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSString *)uniqueId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
@@ -236,33 +270,7 @@ RCT_EXPORT_METHOD(pauseTracking)
 
 RCT_EXPORT_METHOD(createAction :(NSDictionary *) params resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-  HTActionParams * htActionParams = [[HTActionParams alloc] init];
-  
-  if ([params objectForKey: @"expected_place_id"]) {
-    [htActionParams setExpectedPlaceId:params[@"expected_place_id"]];
-  }
-  
-  if ([params objectForKey: @"expected_at"]) {
-    [htActionParams setExpectedAt: params[@"expected_at"]];
-  }
-  
-  if ([params objectForKey: @"type"]) {
-    [htActionParams setType: params[@"type"]];
-  }
-  
-  if ([params objectForKey: @"unique_id"]) {
-    [htActionParams setUniqueId: params[@"unique_id"]];
-  }
-
-  if ([params objectForKey: @"collection_id"]) {
-    [htActionParams setCollectionId: params[@"collection_id"]];
-  }
-  
-  if([params objectForKey: @"expected_place"]){
-    HTPlace * place = [[HTPlace alloc] initWithDict:[params objectForKey: @"expected_place"]];
-    [htActionParams setExpectedPlace: place];
-  }
-  
+  HTActionParams * htActionParams = [self mapDictionaryToHTActionParams:params];
   
   [HyperTrack createAction:htActionParams
                                    :^(HTAction * _Nullable action,
@@ -279,6 +287,52 @@ RCT_EXPORT_METHOD(createAction :(NSDictionary *) params resolve:(RCTPromiseResol
                                      }
                                    }];
   
+}
+
+RCT_EXPORT_METHOD(createMockAction :(NSDictionary *) params resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  HTActionParams * htActionParams = [self mapDictionaryToHTActionParams:params];
+  HTLocationCoordinate *origin = [[HTLocationCoordinate alloc] initWithLat:0 lng:0 ];
+  
+  if ([params objectForKey: @"location"]) {
+    NSDictionary *dict = [params objectForKey: @"location"];
+    if ([dict objectForKey: @"coordinates"]) {
+      NSArray *array = (NSArray *)[dict objectForKey: @"coordinates"];
+      if ([array count] == 2) {
+        origin = [[HTLocationCoordinate alloc] initWithLat:[array.lastObject doubleValue] lng:[array.firstObject doubleValue] ];
+      }
+    }
+  }
+  
+  [HyperTrack createMockAction:origin :NULL :htActionParams completionHandler:^(HTAction * _Nullable action, HTError * _Nullable error) {
+    if (error) {
+      // Handle createAndAssignAction API error here
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
+      return;
+    }
+    if (action) {
+      // Handle createAndAssignAction API success here
+      resolve(@[[action toJson]]);
+    }
+  }];
+}
+
+RCT_EXPORT_METHOD(completeMockAction :(NSString *)actionId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+  [HyperTrack completeMockActionWithActionId:actionId completionHandler:^(HTAction * _Nullable action, HTError * _Nullable error) {
+    if (error) {
+      // Handle error and call failure callback
+      NSError * nsError = [self getErrorFromHyperTrackError:error];
+      reject(@"Error", @"", nsError);
+      return;
+    }
+    
+    if (action) {
+      // Send action to success callback
+      resolve(@[[action toJson]]);
+    }
+  }];
 }
 
 RCT_EXPORT_METHOD(getAction :(NSString *)actionId resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
@@ -307,14 +361,18 @@ RCT_EXPORT_METHOD(getActionForUniqueId :(NSString *)uniqueId resolve:(RCTPromise
       reject(@"Error", @"", nsError);
       return;
     }
-    
     if (actions) {
-      // Send action to success callback
-      NSMutableArray *array = [[NSMutableArray alloc] init];
-      for (HTAction *action in actions) {
-        [array addObject:[action toJson]];
+      if ([actions count] == 0) {
+        NSError *nsError = [self getInvalidParamsError];
+        reject(@"Error", @"", nsError);
+      } else {
+        // Send action to success callback
+        NSMutableArray *array = [[NSMutableArray alloc] init];
+        for (HTAction *action in actions) {
+          [array addObject:[action toJson]];
+        }
+        resolve(array);
       }
-      resolve(array);
     }
   }];
 }
@@ -330,12 +388,17 @@ RCT_EXPORT_METHOD(getActionForCollectionId :(NSString *)collectionId resolve:(RC
     }
     
     if (actions) {
-      // Send action to success callback
-      NSMutableArray *array = [[NSMutableArray alloc] init];
-      for (HTAction *action in actions) {
-        [array addObject:[action toJson]];
+      if ([actions count] == 0) {
+        NSError *nsError = [self getInvalidParamsError];
+        reject(@"Error", @"", nsError);
+      } else {
+        // Send action to success callback
+        NSMutableArray *array = [[NSMutableArray alloc] init];
+        for (HTAction *action in actions) {
+          [array addObject:[action toJson]];
+        }
+        resolve(array);
       }
-      resolve(array);
     }
   }];
 }
@@ -351,12 +414,17 @@ RCT_EXPORT_METHOD(getActionForShortCode :(NSString *)shortCode resolve:(RCTPromi
     }
     
     if (actions) {
-      // Send action to success callback
-      NSMutableArray *array = [[NSMutableArray alloc] init];
-      for (HTAction *action in actions) {
-        [array addObject:[action toJson]];
+      if ([actions count] == 0) {
+        NSError *nsError = [self getInvalidParamsError];
+        reject(@"Error", @"", nsError);
+      } else {
+        // Send action to success callback
+        NSMutableArray *array = [[NSMutableArray alloc] init];
+        for (HTAction *action in actions) {
+          [array addObject:[action toJson]];
+        }
+        resolve(array);
       }
-      resolve(array);
     }
   }];
 }
