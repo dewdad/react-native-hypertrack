@@ -45,7 +45,7 @@ repositories {
 dependencies {
     compile 'com.facebook.react:react-native:0.20.+'
 
-    compile('com.hypertrack:android:0.7.18@aar') {
+    compile('com.hypertrack:android:0.7.28@aar') {
         transitive = true;
     }
 }
