@@ -21,6 +21,11 @@ module.exports = {
      Setup methods
     */
     // get or create a new user
+    getUser(id) {
+        return RNHyperTrack.getUser(id);
+    },
+    
+    // get or create a new user
     getOrCreateUser(name, phoneNumber, uniqueId) {
         return RNHyperTrack.getOrCreateUser(name, phoneNumber, uniqueId);
     },
@@ -146,6 +151,10 @@ module.exports = {
     requestMotionAuthorization() {
         RNHyperTrack.requestMotionAuthorization();
     },
+
+    isActivityAvailable() {
+        RNHyperTrack.isActivityAvailable();
+    }
 
     updateUser(name, phoneNumber, uniqueId, image) {
         return RNHyperTrack.updateUser(name, phoneNumber, uniqueId, image);

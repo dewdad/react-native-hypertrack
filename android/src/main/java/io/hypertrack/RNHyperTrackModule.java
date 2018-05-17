@@ -164,6 +164,29 @@ public class RNHyperTrackModule extends ReactContextBaseJavaModule implements Li
     }
 
     @ReactMethod
+    public void getUser(String id, final Promise promise) {
+        UserParams userParams = new UserParams();
+        userParams.setId(id);
+        HyperTrack.getOrCreateUser(userParams, new HyperTrackCallback() {
+            @Override
+            public void onSuccess(@NonNull SuccessResponse response) {
+                // Return User object in successCallback
+                User user = (User) response.getResponseObject();
+                String serializedUser = new GsonBuilder().create().toJson(user);
+                // successCallback.invoke(serializedUser);
+                promise.resolve(serializedUser);
+            }
+
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                String serializedError = new GsonBuilder().create().toJson(errorResponse);
+                // errorCallback.invoke(serializedError);
+                promise.reject(serializedError);
+            }
+        });
+    }
+
+    @ReactMethod
     public void updateUser(String userName, String phoneNumber, String uniqueId, String photo, final Promise promise) {
         UserParams userParams = new UserParams();
         userParams.setName(userName).setPhone(phoneNumber).setUniqueId(uniqueId);
