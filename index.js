@@ -154,7 +154,7 @@ module.exports = {
 
     isActivityAvailable() {
         RNHyperTrack.isActivityAvailable();
-    }
+    },
 
     updateUser(name, phoneNumber, uniqueId, image) {
         return RNHyperTrack.updateUser(name, phoneNumber, uniqueId, image);
