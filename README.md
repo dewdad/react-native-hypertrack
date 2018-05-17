@@ -144,7 +144,7 @@ RNHyperTrack.locationAuthorizationStatus().then((result) => {
 
 // Call this method to request Location Authorization for Android & iOS (Always Authorization).
 // NOTE: In Android, the Permission dialog box's title and message can be customized by passing them as parameters.
-RNHyperTrack.requestLocationAuthorization(title, message);
+RNHyperTrack.requestAlwaysLocationAuthorization(title, message);
 
 // Call this method to check location services are enabled or not.
 RNHyperTrack.locationServicesEnabled().then((result) => {
@@ -154,26 +154,18 @@ RNHyperTrack.locationServicesEnabled().then((result) => {
 
 // Call this method to check if Motion Activity API is available on the device
 // NOTE: Motion Authorization is required only for iOS. This API will return an error in Android.
-RNHyperTrack.canAskMotionPermissions().then((result) => {
-  // Handle canAskMotionPermissions API result here
-  console.log('canAskMotionPermissions: ', result);
-});
+RNHyperTrack.isActivityAvailable();
 
 // Call this method to request Motion Authorization for iOS.
 // NOTE: Motion Authorization is required only for iOS. This API will return an error in Android.
 RNHyperTrack.requestMotionAuthorization();
 ```
 
-#### 3. Set or create user
-If you have a [user](https://docs.hypertrack.com/v3/api/entities/user.html) that is to be associated with this device, set the user id.
-```javascript
-RNHyperTrack.setUserId("YOUR_USER_ID");
-```
-
-In case you do not have a user, you can create a new user. Calling this API configures the sdk by creating a new user or fetching the existing one, if one exists with the given lookupId.
+#### 3. Get or create user
+Calling this API configures the sdk by creating a new user if not already present or fetching the existing one, if one exists with the given uniqueId.
 
 ```javascript
-RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId).then((success) => {
+RNHyperTrack.getOrCreateUser(name, phoneNumber, uniqueId).then((success) => {
       // Handle getOrCreateUser API success here
       console.log("getOrCreateUser success: ", success);
     }, (error) => {
@@ -182,50 +174,54 @@ RNHyperTrack.getOrCreateUser(name, phoneNumber, lookupId).then((success) => {
     });
 ```
 
-#### 4. Start tracking
-To start tracking on the SDK, use the following method.
+#### 4. Resume tracking
+Tracking is automatically started if there is atleast one action assigned to the user. You can force pause tracking by calling `pauseTracking` method in which case tracking won't be resumed even after assigning an action to the user. To resume the force paused tracking use `resumeTracking` method. Tracking will be started as soon as an action is assigned to the user.
 
 ```javascript
-RNHyperTrack.startTracking().then((success) => {
-      // Handle startTracking API success here
-      console.log("startTracking success: ", success);
-    },
-    (error) => {
-      // Handle startTracking API error here
-      console.log("startTracking error: ", error);
-    });
+RNHyperTrack.resumeTracking();
 ```
 
-#### 5. Create and assign an `Action`
-Create and assign an Action object to the user. The createAndAssignAction method accepts a js dictionary object with `expected_place_id`, `type`, `lookup_id` and `expected_at` keys.
+#### 5. Create an `Action`
+Create and assign an Action object to the user. The createAndAssignAction method accepts a js dictionary object with `expected_place_id`, `type`, `unique_id` and `expected_at` keys.
 
 ```javascript
 var params = {
   'expected_place_id': '8166a3c6-5a55-42be-8c04-d73367b0ad9c',
-  'expected_at': '2017-07-06T01:00:00.000Z'
+  'expected_at': '2017-07-06T01:00:00.000Z',
+  'unique_id': 'order-id-1435223'
 }
 
-RNHyperTrack.createAndAssignAction(params).then((success) => {
-        // Handle createAndAssignAction API success here
-        console.log('createAndAssignAction: ', success);
+RNHyperTrack.createAction(params).then(
+    (success) => {
+        // success callback
+        console.log(success);
     }, (error) => {
-        // Handle createAndAssignAction API error here
-        console.log('createAndAssignAction: ', error);
-    });
+        // error callback
+        console.log(error);
+    }
+);
 ```
 
 #### 6. Completing an action
 If you are using actions for your use-case, you can complete actions through the SDK.
 
 ```javascript
-RNHyperTrack.completeAction("YOUR_ACTION_ID");
+RNHyperTrack.completeActionInSync("YOUR_ACTION_ID").then(
+    (success) => {
+        // success callback
+        console.log(success);
+    }, (error) => {
+        // error callback
+        console.log(error);
+    }
+);
 ```
 
-#### 7. Stop tracking
-To stop tracking on the SDK, use the following method.
+#### 7. Pause tracking
+Tracking is automatically started if there is atleast one action assigned to the user. You can force pause tracking by calling `pauseTracking` method in which case tracking won't be resumed even after assigning an action to the user.
 
 ```javascript
-RNHyperTrack.stopTracking();
+RNHyperTrack.pauseTracking();
 ```
 
 ## Documentation
