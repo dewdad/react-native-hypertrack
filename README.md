@@ -182,7 +182,7 @@ RNHyperTrack.resumeTracking();
 ```
 
 #### 5. Create an `Action`
-Create and assign an Action object to the user. The createAndAssignAction method accepts a js dictionary object with `expected_place_id`, `type`, `unique_id` and `expected_at` keys.
+Create and assign an Action object to the user. The createAction method accepts a js dictionary object with `expected_place_id`, `type`, `unique_id` and `expected_at` keys.
 
 ```javascript
 var params = {
