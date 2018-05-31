@@ -115,6 +115,22 @@ RCT_EXPORT_METHOD(getOrCreateUser :(NSString *)name :(NSString *)phone :(NSStrin
                     }];
 }
 
+RCT_EXPORT_METHOD(getUser :(NSString *)identifier resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  [HyperTrack getUserWithId:identifier
+                    completionHandler:^(HTUser * _Nullable user, HTError * _Nullable error) {
+                      if (user) {
+                        resolve(@[[user toJson]]);
+                      } else if (error) {
+                        NSError * nsError = [self getErrorFromHyperTrackError:error];
+                        reject(@"Error", @"", nsError);
+                      }
+                    }];
+}
+
+RCT_EXPORT_METHOD(isActivityAvailable :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  resolve(@[[NSNumber numberWithBool:[HyperTrack isActivityAvailable]]]);
+}
+
 
 /**
  Location Authorization methods
@@ -511,16 +527,16 @@ RCT_EXPORT_METHOD(isHyperTrackNotification: (NSDictionary *) userInfo :(RCTPromi
   resolve(@[[NSNumber numberWithBool:[HyperTrack isHyperTrackNotificationWithUserInfo:userInfo]]]);
 }
 
-RCT_EXPORT_METHOD(getPlaceline: (NSString *) date :(NSString *)userId :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-  [HyperTrack getPlacelineWithDate:date userId:userId completionHandler:^(HTPlaceline * _Nullable placeline, HTError * _Nullable error) {
-       if (placeline) {
-         resolve(@[[placeline toJson]]);
-       } else if (error) {
-         NSError * nsError = [self getErrorFromHyperTrackError:error];
-         reject(@"Error", @"", nsError);
-       }
-     }];
-}
+//RCT_EXPORT_METHOD(getPlaceline: (NSString *) date :(NSString *)userId :(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+//  [HyperTrack getPlacelineWithDate:date userId:userId completionHandler:^(HTPlaceline * _Nullable placeline, HTError * _Nullable error) {
+//       if (placeline) {
+//         resolve(@[[placeline toJson]]);
+//       } else if (error) {
+//         NSError * nsError = [self getErrorFromHyperTrackError:error];
+//         reject(@"Error", @"", nsError);
+//       }
+//     }];
+//}
 
 RCT_EXPORT_METHOD(getPendingActions: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   [HyperTrack getPendingActionsWithCompletionHandler:^(NSArray<HTAction *> * _Nullable actions, HTError * _Nullable error) {
